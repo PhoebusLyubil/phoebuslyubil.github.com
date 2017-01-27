@@ -5,6 +5,8 @@
 # For technical reasons, this file is *NOT* reloaded automatically when you use
 # 'jekyll serve'. If you change this file, please restart the server process.
 
+ampdir: 'C:/Users/msdeb/Documents/GitHub/phoebuslyubil.github.com/_layouts/amp.html'
+
 # Site settings
 title: Masoud Ebadi Kivaj
 email: phoebuslyubil@gmail.com

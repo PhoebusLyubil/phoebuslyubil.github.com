@@ -3,7 +3,7 @@ layout: page
 title : About
 permalink: /about/
 ---
-
+<link rel="amphtml" href="{{ page.id | prepend: '/YOURDIR' | prepend: site.baseurl | prepend: site.url }}">
 <h2>Masoud Ebadi Kivaj</h2>
 <br>
 <p>Data, Data, my kingdom for some Data [analysis] :) </p>

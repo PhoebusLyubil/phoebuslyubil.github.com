@@ -2,14 +2,16 @@
 layout: page
 title: CV
 permalink: /CV/
+
 ---
+<link rel="amphtml" href="{{ page.id | prepend: '/YOURDIR' | prepend: site.baseurl | prepend: site.url }}">
 <h1 id="masoud-ebadi-kivaj"><a name="masoud-ebadi-kivaj" href="#masoud-ebadi-kivaj"></a>Masoud Ebadi Kivaj</h1>
 <hr class="section">
 <p>Tehran, Iran<br>msdebadi777@gmail.com<br><a href="http:/www.linkedin.com/in/masoud-ebadi-kivaj-0a67256b/">LinkedIn</a></p>
 <hr class="section">
 <h2 id="professional-experiences"><a name="professional-experiences" href="#professional-experiences"></a>Professional Experiences</h2>
-<p>2015- Mar: 2014-Jan<br><strong>Lieutenant</strong><br>    IRIAF (<strong>I</strong>ran <strong>A</strong>ir <strong>F</strong>orce), Tehran, Iran<br><em>21 months of <strong>mandatory</strong> military service by constitution of Iran for every male citizens</em></p>
-<p>2014-Jen: 2014-Oct<br><strong>Data analyst</strong><br><strong>E</strong>cole <strong>N</strong>ationale de l'<strong>A</strong>viation <strong>C</strong>ivile (ENAC), Toulouse, France<br><em>Modelling and forecasting aircraft trajectories using R - Internship</em></p>
+<p>2015- Mar: 2014-Jan<br><strong>Lieutenant</strong><br>    IRIAF (Iran Air Force), Tehran, Iran<br><em>21 months of mandatory military service by constitution of Iran for every male citizens</em></p>
+<p>2014-Jen: 2014-Oct<br><strong>Data analyst</strong><br>Ecole Nationale de l'Aviation Civile (ENAC), Toulouse, France<br><em>Modelling and forecasting aircraft trajectories using R - Internship</em></p>
 <h2 id="education"><a name="education" href="#education"></a>Education</h2>
 <p>2012-2013<br><strong>Master-2 in Economics of Financial markets and Intermediaries</strong><br>Toulouse School of Economics, France<br><em>Thesis subject: What Money Aggregates and Term Structure of Interest Rates tell Us About Future Economic Performance?</em></p>
 <p>2011-2012<br><strong>Master-1 in Economics</strong><br>Toulouse School of Economics, France</p>

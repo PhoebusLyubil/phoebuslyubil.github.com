@@ -26,4 +26,4 @@ permalink: /CV/
 <li>Tehran municipality award for National Mathematics Olympiad (2004-2003)</li><li>Tehran municipality award for National Computer Olympiad (2004-2003)</li></ul>
 <h4 id="hobbies-&-interests"><a name="hobbies-&-interests" href="#hobbies-&-interests"></a>Hobbies &amp; Interests</h4>
 <ul>
-<li>Oil painting: I paint several paintings per year which no one except me likes them :D</li><li>Judo: I love this beautiful sport</li><li>Knowing about different cultures</li><li>Cooking: a little pleasure of mine, like my paintings no one except me likes it :D</li></ul>>
+<li>Oil painting</li><li>Judo</li><li>Knowing about different cultures</li><li>Cooking</li></ul>>

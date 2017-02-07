@@ -502,7 +502,7 @@ FLOATING index. We see some differences, and sharper reactions in case
 of value line.
 
 
-![](img/unnamed-chunk-7-1.png)
+![]( ../img/unnamed-chunk-7-1.png)
 
 ### Conclusion
 

@@ -1,12 +1,13 @@
 ---
 layout: page
-title: 
+title: About me
 subtitle: 
 ---
 
 <link rel="amphtml" href="{{ page.id | prepend: '/YOURDIR' | prepend: site.baseurl | prepend: site.url }}">
-<h2>Data, Data, my kingdom for some Data [analysis] :) </h2>
+<h2>Masoud Ebadi Kivaj</h2>
 <br>
+<p>Data, Data, my kingdom for some Data [analysis] :) </p>
 <br>
 <div class="manual-post">
   <div class="manual manual-title">
@@ -20,4 +21,3 @@ Currently I do most of my analysis with R. In future maybe I would migrate to Ju
 Time to time I would post some of my oil painting here too. I paint a few per year, and normally just a few persons like them, but I do paint them anyway ;) needless to say I am not an expert, it is a hobby of mine.
 <br>
 I hope that with your precious feedback I would be able to enhance my performance. Anyway this is a blog for turning the garden from fancy to reality in 30 years :)
-

@@ -1,7 +1,6 @@
 ---
 layout: page
 title: CV
-permalink: /CV/
 
 ---
 <link rel="amphtml" href="{{ page.id | prepend: '/YOURDIR' | prepend: site.baseurl | prepend: site.url }}">

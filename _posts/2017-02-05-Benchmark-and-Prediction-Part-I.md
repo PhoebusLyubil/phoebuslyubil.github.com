@@ -98,6 +98,7 @@ following functions are used for this:
     # results for sorting
     portion.sym<- llply( sub_year_data, function(x) sort_base_index( x, n.var = 3/4))
 
+
 For the stocks that are included, I would use the last observation for
 their NA values. *This is used for creating index and not testing it for
 prediction, for the data I would use for predictions NA should be
@@ -498,7 +499,7 @@ stocks, and it is below TEPIX and Floating indexes.
 </table>
 
 Ploting Value line geometric index with variable stocks, TEPIX, and
-FLOATING index. We see some differences, and sharper reactions in case
+FLOATING index, the last to are scaled to the value line range. We see some differences, and sharper reactions in case
 of value line.
 
 

@@ -171,21 +171,24 @@ if a faster way could be used in R.). The first value is considered as
       sub_data<- subset(WDATA_last, WDATA_last$DATE <= date_data[ i+1] & WDATA_last$DATE >= date_data[ i])
       sub_index_data<- sub_data[ sub_data$sym %in% as.factor( portion.sym[[ i-1]]),]
       dates.sub<- as.Date( levels( as.factor( sub_index_data$DATE)))
-      VLIC<- c( NA, length( dates.sub))
-      VLIC[1 ]<- last.VLIC
+      
+      VLIC<- cbind(c(rep(NA, (length(dates.sub) + 1))), c(rep(NA, (length(dates.sub) + 1))))
+      VLIC[ 1, 1]<- last.VLIC
       temp<- summarise_each( group_by( sub_index_data[, c( "DATE", "CLOSE")], DATE),
                             funs( mean, "mean", mean( ., na.rm = TRUE)))
-      for ( j in 2: length( dates.sub)) {
-        sub_index_data_date<- subset( sub_index_data, sub_index_data$DATE == dates.sub[ j] )
-        VLIC[ j]<- VLGI( sub_index_data_date$r.C, VLIC[ j - 1])
+      for ( j in 2: (length( dates.sub) + 1)) {
+        sub_index_data_date<- subset( sub_index_data, sub_index_data$DATE == dates.sub[ j-1] )
+        VLIC[ j,]<-  cbind(VLGI( sub_index_data_date$r.C, VLIC[ j - 1, 1]), as.Date(dates.sub[j-1]))
       }
+      VLIC<- VLIC[ complete.cases(VLIC[ ,2]),][, 1]
       temp$VLGI<- VLIC
-      VLIA<- c( NA, length( dates.sub))
-      VLIA[1 ]<- last.VLIA
-      for ( j in 2: length( dates.sub)) {
-        sub_index_data_date<- subset( sub_index_data, sub_index_data$DATE == dates.sub[j] )
-        VLIA[j]<- VLAI( sub_index_data_date$r.C, VLIA[ j - 1])
+      VLIA<- cbind(c(rep(NA, (length(dates.sub) + 1))), c(rep(NA, (length(dates.sub) + 1))))
+      VLIA[1, 1]<- last.VLIA
+      for ( j in 2: (length( dates.sub) + 1)) {
+        sub_index_data_date<- subset( sub_index_data, sub_index_data$DATE == dates.sub[ j-1] )
+        VLIA[j]<- cbind(VLAI( sub_index_data_date$r.C, VLIA[ j - 1, 1]), as.Date(dates.sub[j-1]))
       }
+      VLIA<- VLIA[ complete.cases(VLIA[ ,2]),][, 1]
       temp$VLAI<- VLIA
       last.VLIC<- VLIC[ length(VLIC)]
       last.VLIA<- VLIA[ length(VLIA)]

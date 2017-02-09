@@ -379,5 +379,6 @@ post about how to partly hedge these risk with existed instruments, oh
 yeah, I talked about instruments, but there is no options, Forex futures
 and short selling of stocks possible in this market and I have no access
 to international markets. I would try my best and cross my fingers for
-that, Voila! \*\* Please inform me about your feedback, I will be deeply
+that, Voila! 
+\*\* Please inform me about your feedback, I will be deeply
 grateful for that :) \*\*

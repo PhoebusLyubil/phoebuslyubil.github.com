@@ -518,5 +518,6 @@ Out-of-sample RMSE shows that my guesses are not rejected:
 
 In the next post I will see how clustering will affect the results.
 
+
 \*\* Please inform me about your feedback, I will be deeply grateful for
 that :) \*\*

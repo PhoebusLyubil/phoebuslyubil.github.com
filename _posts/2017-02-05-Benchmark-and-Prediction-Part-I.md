@@ -2,6 +2,7 @@
 layout: post
 subtitle: Creating Indexes
 tags: [index, benchmark, rolling window RMSE, out-of-sample]
+comments: true
 ---
 
 
@@ -99,10 +100,8 @@ following functions are used for this:
     portion.sym<- llply( sub_year_data, function(x) sort_base_index( x, n.var = 3/4))
 
 
-For the stocks that are included, I would use the last observation for
-their NA values. *This is used for creating index and not testing it for
-prediction, for the data I would use for predictions NA should be
-included. *
+For the stocks that are included, I would use the last observation for their NA values. *This is used for creating index and not testing it for prediction, for the data I would use for predictions NA is
+included.*
 
     NA_last_obs = function(x) {   
       ind = which(!is.na(x))      
@@ -123,8 +122,8 @@ used three methods for creating indexes:
 -   Simple mean
 
 And for each of them I consider three kinds of data, fixed amount of
-stocks based on volume, variable amount, and all the stocks. \* Only
-fixed amount follows the Value line Composite definition.\* Since the
+stocks based on volume, variable amount, and all the stocks. *Only
+fixed amount follows the Value line Composite definition.* Since the
 the functions use previous value, I need to use for loops. ( Plz tell me
 if a faster way could be used in R.). The first value is considered as
 1.
@@ -519,5 +518,4 @@ Out-of-sample RMSE shows that my guesses are not rejected:
 In the next post I will see how clustering will affect the results.
 
 
-\*\* Please inform me about your feedback, I will be deeply grateful for
-that :) \*\*
+###### *Please inform me about your feedback, I will be deeply grateful for that :)*

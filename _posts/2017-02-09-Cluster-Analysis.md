@@ -17,7 +17,7 @@ to use cluster analysis. Since I don't want the number of each group to
 be similar, I would not use k-means. I would rather use hierarchical
 clustering using Ward method.
 
-having used ward method, first I would consider number of clusters,
+Having used ward method, first I would consider number of clusters,
 varying between 1 to 7 and take the one with the least out-of-sample
 rolling RMSE. Then I would consider different kind of distances to find
 which one results better results with the same criterion.
@@ -25,7 +25,7 @@ which one results better results with the same criterion.
 I had expect that 3 clusters with Malinowski distances less than 1 (
 *L*<sub>*p*</sub>*n**o**r**m**s* , before this post I was using p = 0.7,
 so the outliers would be less influential in clustering results), yet
-the results contrary to my surprise yielded different outcomes.
+the results ,to my surprise, yielded different outcomes.
 
 ### Clusters and indexes for each
 
@@ -94,8 +94,12 @@ clusters and groups:
       groups[[i]]<- temp
     }
 
+
+*Here I used Whole sample for estimating clusters, this is against crossvalidation methods, since the data have lots of NA and because of that computing distances with rolling window was not possible, I used this method. I used this method with 3 cluster before and* **Temporal graph of clusters varies a lot during time.** 
 Now that the we get the name of members for each group we can make
 indexes for each of them. Using last posts results we have:
+
+
 
     index.maker<- function(WDATA. = WDATA, date_data. = date_data,
                            sort_base_index. = sort_base_index,
@@ -355,7 +359,7 @@ criterion. But my idea about inclusion of outliers is rejected. Although
 I have not printed the groups since they are very lengthy, We would see
 more similar companies when *p* is less than one, yet the results are
 worse. When *p* is less than one one cluster is about auto-makers, and
-one include pharmacies industries (previously I saw sugar industry), but
+one include pharmaceutical industries (previously I saw sugar industry), but
 with Eluciden distance, results are more mixed, and number of members
 are much more. But we can see that most petrochemicals and petroleum
 companies are in the same cluster with some other companies of which
@@ -380,5 +384,5 @@ yeah, I talked about instruments, but there is no options, Forex futures
 and short selling of stocks possible in this market and I have no access
 to international markets. I would try my best and cross my fingers for
 that, Voila! 
-\*\* Please inform me about your feedback, I will be deeply
-grateful for that :) \*\*
+
+###### *Please inform me about your feedback, I will be deeply grateful for that :)*

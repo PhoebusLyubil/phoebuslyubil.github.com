@@ -19,11 +19,11 @@ title:
 
 #### Whirpool trio 3
 
-![Whirpool trio 3](../img/paintings/Whirpool3.jpg)
+![Whirpool trio 3](../img/paintings/whirpool3.jpg)
 
 #### Whirpool trio 2
 
-![Whirpool trio 2](../img/paintings/Whirpool2.jpg)
+![Whirpool trio 2](../img/paintings/whirpool2.jpg)
 
 #### Whirpool trio 1
 

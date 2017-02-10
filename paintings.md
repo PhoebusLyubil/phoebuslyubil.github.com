@@ -1,8 +1,9 @@
 ---
 layout: page
-title: Paintings
+title: 
 
 ---
+<link rel="amphtml" href="{{ page.id | prepend: '/YOURDIR' | prepend: site.baseurl | prepend: site.url }}">
 
 #### Service millitaire
 

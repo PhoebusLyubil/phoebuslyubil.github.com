@@ -3,26 +3,31 @@ layout: page
 title: Paintings
 
 ---
+
 #### Service millitaire
-![Service millitaire]( ../img/paintings/Service millitaire.jpg)
+
+![Service millitaire](C:/paintings/Service%20millitaire.png)
 
 #### Bewilderment
-![Bewilderment]( ../img/paintings/bewilderment.jpg)
+
+![Bewilderment](C:/paintings/bewilderment.png)
 
 #### without name
-![]( ../img/paintings/yellow curves.jpg)
+
+![](C:/paintings/yellow%20curves.png)
 
 #### Whirpool trio 3
-![Whirpool trio 3]( ../img/paintings/Whirpool 3.jpg)
 
+![Whirpool trio 3](C:/paintings/Whirpool%203.png)
 
 #### Whirpool trio 2
-![Whirpool trio 2]( ../img/paintings/Whirpool 2.jpg)
 
+![Whirpool trio 2](C:/paintings/Whirpool%202.png)
 
 #### Whirpool trio 1
-![Whirpool trio 1]( ../img/paintings/Whirpool 1.jpg)
+
+![Whirpool trio 1](C:/paintings/Whirpool%201.png)
 
 #### Drop
-![Drop]( ../img/paintings/drop.jpg)
 
+![Drop](C:/paintings/drop.png)

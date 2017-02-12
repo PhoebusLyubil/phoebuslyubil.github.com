@@ -164,76 +164,131 @@ was negative. This include negative return that are more inclusive than
 just negative returns based on external factors. We do that and compute
 HAC standard errors for OLS.
 
-   
-    library(sandwich)
-    library(lmtest)
 
-    #  conditioning on negative VLGI return
-    nmdataDI<- mdataDI[mdataDI$DVLGI<0,]
-    #cross correlation
-    #ccf(drop(dataDI$DUSD), drop(dataDI$DVLGI), lag = 100)
+    
+<table style="width:79%;">
+<caption>Fitting linear model: DVLGI ~ L3DUSD - 1</caption>
+<colgroup>
+<col width="18%" />
+<col width="15%" />
+<col width="18%" />
+<col width="13%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">Estimate</th>
+<th align="center">Std. Error</th>
+<th align="center">t value</th>
+<th align="center">Pr(&gt;|t|)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>L3DUSD</strong></td>
+<td align="center">-0.4157</td>
+<td align="center">0.1179</td>
+<td align="center">-3.527</td>
+<td align="center">0.00142</td>
+</tr>
+</tbody>
+</table>
 
-    fit3 <- lm(DVLGI ~ L3DUSD  -1 , data = nmdataDI)
-    summary(fit3)
+<table style="width:85%;">
 
-    ## 
-    ## Call:
-    ## lm(formula = DVLGI ~ L3DUSD - 1, data = nmdataDI)
-    ## 
-    ## Residuals:
-    ##       Min        1Q    Median        3Q       Max 
-    ## -0.120880 -0.056091 -0.026038 -0.009082  0.041461 
-    ## 
-    ## Coefficients:
-    ##        Estimate Std. Error t value Pr(>|t|)   
-    ## L3DUSD  -0.4157     0.1179  -3.527  0.00142 **
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 0.05132 on 29 degrees of freedom
-    ##   (2 observations deleted due to missingness)
-    ## Multiple R-squared:  0.3002, Adjusted R-squared:  0.2761 
-    ## F-statistic: 12.44 on 1 and 29 DF,  p-value: 0.00142
+<colgroup>
+<col width="20%" />
+<col width="30%" />
+<col width="11%" />
+<col width="22%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Observations</th>
+<th align="center">Residual Std. Error</th>
+<th align="center"><span class="math inline"><em>R</em><sup>2</sup></span></th>
+<th align="center">Adjusted <span class="math inline"><em>R</em><sup>2</sup></span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">30</td>
+<td align="center">0.05132</td>
+<td align="center">0.3002</td>
+<td align="center">0.2761</td>
+</tr>
+</tbody>
+</table>
 
-    coeftest(fit3, vcov. = vcovHC)
+<table style="width:81%;">
+<caption>Fitting linear model: DVLGI ~ L_3DUSD - 1</caption>
+<colgroup>
+<col width="19%" />
+<col width="15%" />
+<col width="18%" />
+<col width="13%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">Estimate</th>
+<th align="center">Std. Error</th>
+<th align="center">t value</th>
+<th align="center">Pr(&gt;|t|)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>L_3DUSD</strong></td>
+<td align="center">-0.4644</td>
+<td align="center">0.1871</td>
+<td align="center">-2.482</td>
+<td align="center">0.0189</td>
+</tr>
+</tbody>
+</table>
 
-    ## 
-    ## t test of coefficients:
-    ## 
-    ##         Estimate Std. Error t value  Pr(>|t|)    
-    ## L3DUSD -0.415719   0.075202  -5.528 5.855e-06 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+<table style="width:85%;">
 
-    fit_3 <- lm(DVLGI ~ L_3DUSD  -1 , data = nmdataDI)
-    summary(fit_3)
-
-    ## 
-    ## Call:
-    ## lm(formula = DVLGI ~ L_3DUSD - 1, data = nmdataDI)
-    ## 
-    ## Residuals:
-    ##       Min        1Q    Median        3Q       Max 
-    ## -0.143852 -0.052531 -0.027098 -0.006735  0.051249 
-    ## 
-    ## Coefficients:
-    ##         Estimate Std. Error t value Pr(>|t|)  
-    ## L_3DUSD  -0.4644     0.1871  -2.482   0.0189 *
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 0.05541 on 30 degrees of freedom
-    ##   (1 observation deleted due to missingness)
-    ## Multiple R-squared:  0.1703, Adjusted R-squared:  0.1427 
-    ## F-statistic: 6.159 on 1 and 30 DF,  p-value: 0.0189
-
-    coeftest(fit_3, vcov. = vcovHC)
+<colgroup>
+<col width="20%" />
+<col width="30%" />
+<col width="11%" />
+<col width="22%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Observations</th>
+<th align="center">Residual Std. Error</th>
+<th align="center"><span class="math inline"><em>R</em><sup>2</sup></span></th>
+<th align="center">Adjusted <span class="math inline"><em>R</em><sup>2</sup></span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">31</td>
+<td align="center">0.05541</td>
+<td align="center">0.1703</td>
+<td align="center">0.1427</td>
+</tr>
+</tbody>
+</table>
 
     ## 
     ## t test of coefficients:
     ## 
     ##         Estimate Std. Error t value Pr(>|t|)  
     ## L_3DUSD -0.46441    0.19014 -2.4425  0.02069 *
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+    ## 
+    ## t test of coefficients:
+    ## 
+    ##         Estimate Std. Error t value  Pr(>|t|)    
+    ## L3DUSD -0.415719   0.075202  -5.528 5.855e-06 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 

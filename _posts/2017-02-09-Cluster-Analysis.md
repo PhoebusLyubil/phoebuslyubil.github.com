@@ -158,8 +158,9 @@ indexes for each of them. Using last posts results we have:
 
 ### Computing results
 
-Using previously named function, we parallel compute the results for predictory autoregressive regression $r_{i,t} = \alpha + \beta_1r_{i,t-1} + \beta_2 r_{m, t-1} + e$ :
-:
+Using previously named function, we parallel compute the results for predictory autoregressive regression 
+*r*<sub>*i*,â€†*t*</sub>â€„=â€„*Î±*â€…+â€…*Î²*<sub>1</sub>*r*<sub>*i*,â€†*t*â€…âˆ’â€…1</sub>â€…+â€…*Î²*<sub>2</sub>*r*<sub>*m*,â€†*t*â€…âˆ’â€…1</sub>â€…+â€…*e*
+ :
 
     th= floor((Sys.Date() - as.Date("2014-03-21"))*240/365)
     h<-1

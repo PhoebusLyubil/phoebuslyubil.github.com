@@ -14,9 +14,10 @@ title: CV
 <h2 id="education"><a name="education" href="#education"></a>Education</h2>
 <p>2012-2013<br><strong>Master-2 in Economics of Financial markets and Intermediaries</strong><br>Toulouse School of Economics, France<br><em>Thesis subject: What Money Aggregates and Term Structure of Interest Rates tell Us About Future Economic Performance?</em></p>
 <p>2011-2012<br><strong>Master-1 in Economics</strong><br>Toulouse School of Economics, France</p>
+<p>2011-2012<br><strong>Bachelor in Economics</strong><br>Allameh Tabataba'i University, Iran</p>
 <h4 id="language-skills"><a name="language-skills" href="#language-skills"></a>Language Skills</h4>
 <ul>
-<li>English (Good)</li><li>Persian (Mother language) </li><li>French (Intermediate)</li><li>Azeri (Basic)</li></ul>
+<li>English (Full professional proficiency)</li><li>Persian (Mother language) </li><li>French (Intermediate)</li><li>Azeri (Basic)</li></ul>
 <h4 id="computer-skills"><a name="computer-skills" href="#computer-skills"></a>Computer Skills</h4>
 <ul>
 <li>MS Office </li><li>Programs: R, Eviews, Stata, Matlab, SQL</li></ul>

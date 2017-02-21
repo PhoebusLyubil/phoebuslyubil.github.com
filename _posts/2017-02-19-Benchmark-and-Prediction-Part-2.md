@@ -12,8 +12,10 @@ Benchmark Part II
 For Constantly Rebalanced Portfolio (hereafter CPR) same distribution of
 weights is used for all periods. Since CPR uses all the available data,
 it is a rather omniscient benchmark that uses least effort. I use
-monthly returns to compute the optimal weights for CPR wealth factor $$\prod_{t=1}^{n} \sum_{i=1}^{m} w_{i} r_{tj}$$ in which *m* is number
+monthly returns to compute the optimal weights for CPR wealth factor ![f1] in which *m* is number
 of stocks and *w*<sub>*i*</sub>s are their respective weight.
+
+[f1]: http://chart.apis.google.com/chart?cht=tx&chl=\prod_{t=1}^{n} \sum_{i=1}^{m} w_{i} r_{tj} 
 
 Since newly introduced stocks are numerous I use the same method as
 before for computing 3/4 most traded stocks for the six month period

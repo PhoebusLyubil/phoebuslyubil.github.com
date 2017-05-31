@@ -1,6 +1,6 @@
 ---
 layout: post
-subtitle: Sky is the limit, censored and chained
+subtitle: Sky is the limit, censored. Let's chaine it.
 tags: [Price limit, Markov chains, censored normal distribution, Information in High and Low, R]
 comments: true
 ---

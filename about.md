@@ -21,3 +21,7 @@ Time to time I would post some of my oil painting here too. I paint a few per ye
 <br>
 I hope that with your precious feedback I would be able to enhance my performance. Anyway this is a blog for turning the garden from fancy to reality in 30 years :)
 
+<h2>Disclaimer:</h2>
+
+The information in here is not intended as tax, legal, investment, retirement or any kind of advice or recommendations, these are just my hubbies. You are encouraged to seek advice from an independent professional advisor (You could contact me if you like, and then a proper work could be done by me :) ). The content is derived by R which has no guarantee at all. Neither the information presented nor any opinion expressed constitutes a solicitation for the purchase or sale of any security or a strategy to do this.
+

@@ -388,3 +388,5 @@ to international markets. I would try my best and cross my fingers for
 that, Voila! 
 
 ###### *Please inform me about your feedback, I will be deeply grateful for that :)*
+
+###### For disclaimer please see about page.

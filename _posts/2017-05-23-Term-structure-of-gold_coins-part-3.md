@@ -558,3 +558,6 @@ going to be used, and since I just do these things for fun, I would not
 do it here :)
 
 ###### *Please inform me about your feedback, I will be deeply grateful for that :)*
+
+###### For disclaimer please see about page.
+

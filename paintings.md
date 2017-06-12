@@ -5,6 +5,14 @@ title:
 ---
 <link rel="amphtml" href="{{ page.id | prepend: '/YOURDIR' | prepend: site.baseurl | prepend: site.url }}">
 
+#### Enchaine
+
+![Enchaine](../img/paintings/Enchaine.jpg)
+
+#### Eruption
+
+![Eruption](../img/paintings/Eruption.jpg)
+
 #### Service millitaire
 
 ![Service millitaire](../img/paintings/Service%20millitaire.jpg)
@@ -28,6 +36,10 @@ title:
 #### Whirpool trio 1
 
 ![Whirpool trio 1](../img/paintings/Whirpool1.jpg)
+
+#### Dena
+
+![Dena](../img/paintings/Dena.jpg)
 
 #### Drop
 

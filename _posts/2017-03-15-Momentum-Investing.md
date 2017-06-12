@@ -168,3 +168,5 @@ yet, so I got the time and I'll do it soon. Nowruz holidays
 are in few days, lets find some suitable strategies during that :)) ).
 
 ###### *Please inform me about your feedback, I will be deeply grateful for that :)*
+
+###### For disclaimer please see about page.

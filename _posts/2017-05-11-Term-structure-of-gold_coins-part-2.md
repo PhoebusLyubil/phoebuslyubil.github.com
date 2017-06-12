@@ -491,3 +491,6 @@ forecasts of c3c2 is better. Forecast of c4c3 shows a bump in middle of
 the chart that does not exist for the original series.
 
 ###### *Please inform me about your feedback, I will be deeply grateful for that :)*
+
+###### For disclaimer please see about page.
+

@@ -156,3 +156,5 @@ make it semi online, or compute it with predictory purposes. I would do
 that in another post.
 
 ###### *Please inform me about your feedback, I will be deeply grateful for that :)*
+
+###### For disclaimer please see about page.

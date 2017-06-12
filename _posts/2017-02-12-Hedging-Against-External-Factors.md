@@ -305,3 +305,5 @@ figured out by looking at the news and seeing were authorities have
 intertwined firstly).
 
 ###### *Please inform me about your feedback, I will be deeply grateful for that :)*
+
+###### For disclaimer please see about page.

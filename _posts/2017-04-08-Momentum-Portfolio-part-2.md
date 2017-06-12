@@ -160,3 +160,5 @@ from 2 more than 4 years drawdown. So it is not a reasonable method of
 investing in my view.
 
 ###### *Please inform me about your feedback, I will be deeply grateful for that :)*
+
+###### For disclaimer please see about page.

@@ -114,3 +114,5 @@ R or any other language that could be used for getting data from
 tsetmc.com, I would deeply appreciate it.
 
 ###### *Please inform me about your feedback, I will be deeply grateful for that :)*
+
+###### For disclaimer please see about page.

@@ -331,5 +331,6 @@ arbitrage free nelson sigel term
 structure](http://www.frbsf.org/economic-research/files/wp07-20bk.pdf)
 in the future posts.
 
-\*\* Please inform me about your feedback, I will be deeply grateful for
-that :) \*\*
+###### *Please inform me about your feedback, I will be deeply grateful for that :)*
+
+###### For disclaimer please see about page.

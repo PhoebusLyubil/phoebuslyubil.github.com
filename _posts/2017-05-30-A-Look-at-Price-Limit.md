@@ -863,3 +863,5 @@ possible seems to be useful in my future decision making about my
 retirement portfolio.
 
 ###### *Please inform me about your feedback, I will be deeply grateful for that :)*
+
+###### For disclaimer please see about page.

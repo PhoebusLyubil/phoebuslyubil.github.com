@@ -281,3 +281,5 @@ Having all methods, hereafter I think using VLGI as a predictory
 variable seems better than others. So I would use that as my benchmark.
 
 ###### *Please inform me about your feedback, I will be deeply grateful for that :)*
+
+###### For disclaimer please see about page.

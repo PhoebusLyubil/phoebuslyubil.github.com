@@ -5,6 +5,10 @@ title:
 ---
 <link rel="amphtml" href="{{ page.id | prepend: '/YOURDIR' | prepend: site.baseurl | prepend: site.url }}">
 
+#### Zukhra
+
+![Zukhra](../img/paintings/Zukhra.jpg)
+
 #### Enchaine
 
 ![Enchaine](../img/paintings/Enchaine.jpg)

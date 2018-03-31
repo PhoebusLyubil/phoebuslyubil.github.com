@@ -26,7 +26,7 @@ navbar-links:
   About: "about"
   CV: "CV"
   Paintings: "paintings"
-  Links: "Links"
+  #Links: "Links"
 
 # Image to show in the navigation bar - image must be a square (width = height)
 # Remove this parameter if you don't want an image in the navbar
@@ -71,7 +71,7 @@ share-links-active:
 disqus: https-phoebuslyubil-github-io
 
 # Fill in your Google Analytics ID to track your website using GA
-#google_analytics: ""
+google_analytics: "UA-116657732-1"
 
 # Google Tag Manager ID
 #gtm: ""

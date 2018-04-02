@@ -1,3 +1,11 @@
+---
+layout: post
+subtitle: Predicting Index
+tags: [LASSO, Riged, Elastic net, AR, rnn, Recurrent Neural Network, gru, lstm, rwgrwssion Shrinkage, PCA, Random Forest, R, nnetar]
+comments: true
+---
+
+
 ### Current problem
 
 When I was assessing the CRP portfolio which it's horse power is
@@ -819,6 +827,8 @@ Although methods that use lagged predicted variable in use show better
 results, the forecast is not available due to construction of annualized
 six month growth. Also considering RMSE for the rest of methods, they
 are useless in action.
+
+So the methods failed to assimilate Cassandra :))
 
 ###### *Please inform me about your feedback, I will be deeply grateful for that :)*
 

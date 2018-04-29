@@ -5,6 +5,14 @@ title:
 ---
 <link rel="amphtml" href="{{ page.id | prepend: '/YOURDIR' | prepend: site.baseurl | prepend: site.url }}">
 
+#### Mouth: haine
+
+![Mouth: haine](../img/paintings/mouth haine.jpg)
+
+#### Port
+
+![Port](../img/paintings/port.jpg)
+
 #### Zukhra
 
 ![Zukhra](../img/paintings/Zukhra.jpg)

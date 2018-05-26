@@ -49,6 +49,19 @@ title:
 
 ![Whirpool trio 1](../img/paintings/Whirpool1.jpg)
 
+#### Magnet: Sia's four passions
+
+![Magnet: Sia's four passions](../img/paintings/magnet.jpg)
+
+
+#### Mousse 
+
+###### Intentionally misspelled, and yes she is in a wind tunnel :))
+
+![Mousse ](../img/paintings/mousse.jpg)
+
+
+
 #### Dena
 
 ![Dena](../img/paintings/Dena.jpg)

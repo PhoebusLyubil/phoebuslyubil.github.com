@@ -7,11 +7,11 @@ title:
 
 #### Mouth: haine
 
-![Mouth: haine](../img/paintings/mouth haine.jpg)
+![Mouth: haine](../img/paintings/mouth haine.JPG)
 
 #### Port
 
-![Port](../img/paintings/port.jpg)
+![Port](../img/paintings/port.JPG)
 
 #### Zukhra
 
@@ -51,14 +51,14 @@ title:
 
 #### Magnet: Sia's four passions
 
-![Magnet: Sia's four passions](../img/paintings/magnet.jpg)
+![Magnet: Sia's four passions](../img/paintings/magnet.JPG)
 
 
 #### Mousse 
 
 ###### Intentionally misspelled, and yes she is in a wind tunnel :))
 
-![Mousse ](../img/paintings/mousse.jpg)
+![Mousse ](../img/paintings/mousse.JPG)
 
 
 

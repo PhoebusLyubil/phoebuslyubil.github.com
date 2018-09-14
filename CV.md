@@ -9,6 +9,7 @@ title: CV
 <p>Tehran, Iran<br>msdebadi777@gmail.com<br><a href="http:/www.linkedin.com/in/masoud-ebadi-kivaj-0a67256b/">LinkedIn</a></p>
 <hr class="section">
 <h2 id="professional-experiences"><a name="professional-experiences" href="#professional-experiences"></a>Professional Experiences</h2>
+<p>2015- Mar: 2014-Jan<br><strong>Trader</strong><br>    Freelance, Tehran, Iran<br><em>Trading equities in Tehran Stock exchange</em></p>
 <p>2015- Mar: 2014-Jan<br><strong>Lieutenant</strong><br>    IRIAF (Iran Air Force), Tehran, Iran<br><em>21 months of mandatory military service by constitution of Iran for every male citizens</em></p>
 <p>2014-Jen: 2014-Oct<br><strong>Data analyst</strong><br>Ecole Nationale de l'Aviation Civile (ENAC), Toulouse, France<br><em>Modelling and forecasting aircraft trajectories using R - Internship</em></p>
 <h2 id="education"><a name="education" href="#education"></a>Education</h2>

@@ -5,6 +5,16 @@ title:
 ---
 <link rel="amphtml" href="{{ page.id | prepend: '/YOURDIR' | prepend: site.baseurl | prepend: site.url }}">
 
+#### Whirlpool ensemble
+
+![Whirlpool ensemble](../img/paintings/Whirlpool ensemble.JPG)
+
+#### Transmutation 
+
+###### For a little fun, rotate the painting :))
+
+![Transmutation](../img/paintings/Transmutation.JPG)
+
 #### Mouth: haine
 
 ![Mouth: haine](../img/paintings/mouth haine.JPG)

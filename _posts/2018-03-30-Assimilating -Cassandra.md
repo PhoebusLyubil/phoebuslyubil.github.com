@@ -8,24 +8,21 @@ comments: true
 
 ### Current problem
 
-When I was assessing the CRP portfolio which it's horse power is
-variance, I noticed that returns suffer extensively from portfolios
-Beta. Although it is hedge as I said in the related post, I wanted to
+When I was assessing the CRP portfolio, I found that it's horse power is
+variance. Constructed CRP returns suffered extensively from portfolios
+Beta. Although it was hedged as I said in the related post, I wanted to
 improve it by predicting VLGI. If downturns could be avoided, the amount
-of foreign exchange which I computed by negative beta correlation could
-reduce substantially.
+of needed hedge portfolio value could be reduced substantially.
 
 *I computed the following in October last year, so the results are out of date.*
 
 ### Idea
 
-I thought that comparing different methods is so mainstream so I thought
-about some modifications. My idea is this: generally predefined lags are
-used, yet since monetary variables takes time to show their effects lets
-use correlation for using the lags that should be used.I was thinking
-that since rnn based methods could capture non-linear relations, I used
-"Kendall's tau coefficient". Further, I saw no need for taking largest
-tau, lets see what happens if the number that we take get bigger.
+My idea is this: generally predefined lags are used, yet since monetary variables takes time to show their effects lets
+use correlation for finding the lags that should be used.I was thinking
+that since rnn based methods could capture non-linear relations, using
+"Kendall's tau coefficient" seems agreeable. Further, I saw no need for taking largest
+tau, lets see what happens if the number of variables that we take get bigger.
 
 ### Methods
 
@@ -59,8 +56,8 @@ banking rates like default rate, and finally oil production.
 ### code
 
 Iranian websites normally provide data in excel format. I need to
-annualized monthly data for VLGI and to compute quarterly, bi-annual,
-3-quarter and annual growth rate. Since I am a little lazy I used lead
+annualize monthly data for VLGI and growth rates need to be computed in quarterly, bi-annual,
+3-quarter and annual frequencies. Since I am a little lazy I used lead
 of the computed annualized variables instead of lagging all the other
 variables :))
 
@@ -272,7 +269,7 @@ variable, the number that explains 85 percent could vary substantially.
        
      }
 
-For Random Forest first "mtray" is tuned then compute it.
+For Random Forest first "mtray" is tuned then it was computed.
 
      rf.fun<- function( train.d. = train.d, valid.d. = valid.d){
        
@@ -326,7 +323,7 @@ not been pretty familiar with these methods, and I loved to work with
 them because of that :) I used brute force optimization for optimizing
 on training set.
 
-The time these methods estimations use suggest using parallel
+The time needed for estimating suggests using parallel
 computations.
 
      rnn.fun<- function(data, net.type = "gru",
@@ -444,12 +441,12 @@ Lets compute them together:
 
 #### DA DA!!
 
-DA DA! the results is could be pretty good for 1-step ahead forecast
+DA DA! Results  could be pretty good for 1-step ahead forecast
 (the results are not shown here) but in reality most of the data that
 are used are NA based on their timing of release. I need to put at least
 five months before hand for the data to be published. (yes, I know, Iran
-central bank publish everything like the most other public things, they
-surely take their time of publishing things.)
+central bank publish everything like the most other Iranian public institutions, they
+surely take their time for publishing data.)
 
 So lets see 6-step-ahead forecast. Row names stands for the number of
 lags that been chosen. The first line "1.1" shows the result by simply
@@ -568,11 +565,11 @@ considering one lag.
 </tbody>
 </table>
 
-The results based on using predicted variable ( annualized six month
+The results based on using lags of predicted variable ( annualized six month
 growth) or not have different RMSE.
 
 Since using lag variables of annualized six month growth produce NAs at
-the end of data, they just provide 1-step ahead forecast in at the tail
+the end of data, they just provide 1-step ahead forecast at the tail
 of forecast and the rest of forecasts are not computable due to NAs. So
 the results are as follows:
 
@@ -583,7 +580,7 @@ the results are as follows:
     Lasso, enet, RF, rnn, gru, and lstm, are not performing better
     than AR(1). and random forest seems to be better than other methods.
 
-In practice what is important to me for my CRP portfolio is ability to
+In practice what is important to me is ability to
 predicting negative returns, lets see how are the MAE for 10% and 20%
 quantiles.
 
@@ -823,7 +820,7 @@ better than random forest.
 Conclusion
 ----------
 
-Although methods that use lagged predicted variable in use show better
+Although methods that use lagged predicted variable show better
 results, the forecast is not available due to construction of annualized
 six month growth. Also considering RMSE for the rest of methods, they
 are useless in action.

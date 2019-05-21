@@ -10,12 +10,12 @@ comments: true
 
 ### Minimum-Chi-Square Estimation of Latent Factor Model
 
-In process of fitting wrong models fr right reasons, I would try to
+In process of fitting wrong models for right reasons, I would try to
 estimate latent 3 factor model using minimum-chi-square estimation that
 is described [here](http://www.nber.org/papers/w17772.pdf). Again since
 interest rate is constant and convenience yield is zero, I chose this
 group of models. Literally using the same name is not correct, anyhow I
-would call them as their original name.
+would call them by their original name.
 
 ### OLS extimations
 

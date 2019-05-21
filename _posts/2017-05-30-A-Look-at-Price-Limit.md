@@ -11,13 +11,13 @@ comments: true
 Price limit and Markov Chains
 -----------------------------
 
-One of the things that bothers me about Tehran Stocks are is price
-limit. It simply distorts market adjusting procedure and causes binomial
+One of the things that bothers me about Tehran Stocks Market is price
+limit. It simply distorts market adjustment procedure and causes binomial
 changes in liquidity. Since it exist and my retirement portfolio was
 subject to it several times, I saw a need for taking a look at it.
 Another thing that is tightly related to this is that final price is
-weighted average of intraday trades. As a result it is possible that
-there is a positive shock and since the effect is perceived by all
+weighted average of intraday trades. As a result it is possible that 
+a positive shock happens and since the effect is perceived by all
 participants to be more than the limit, the price would not change and
 liquidity becomes zero. Although an extreme case, yet this extremities
 give insight about what need to be examined.

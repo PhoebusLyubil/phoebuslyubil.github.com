@@ -58,7 +58,7 @@ are constant, which is not a plausible assumption. Given the problems I
 mentioned in last post I decided this manner. Another important matter
 is that since I reduced the stocks to listed tradable stocks and not all
 the stocks that are tradable, and since some data was discountinious,
-the data and analysis severly suffer from survivorship bias.*
+the data and analysis are subject to from survivorship bias.*
 
 A slightly different version of last post function, which now filters
 based on small vs big is used for getting the symbol names:

@@ -379,14 +379,14 @@ value of its inventory:
 minimum position = 20000 Kg payoff in case of bidding at base price:
 
 −(*P**b**c* − *m**r**k**u**p*)\*20000 + *P**b**c* \* *I**n**v*/*k* − *P*.*p**r**v*.*a**u**c* \* *I**n**v*/*k*
-*s*.*t**k* \* 20 &lt; =*s**u**p**p**l**y*
+*s*.*t. : k x  20 &lt;= *supply
 
 payoff in case of an increase in bid equal to average increase:
-−(*P**c* − *m**r**k**u**p*)\*20000 + *P**c* \* *I**n**v*/*k* − *P*.*p**r**v*.*a**u**c* \* *I**n**v*/*k*
-*s*.*t**k* \* 20 = *s**u**p**p**l**y*
+−(*Pc* − *m**r**k**u**p*)\*20000 + *Pc* \* *I**n**v*/*k* − *P*.*p**r**v*.*a**u**c* \* *I**n**v*/*k*
+*s*.*t. : *k x  20 = *s**u**p**p**ly*
 
 payoff in case of bidding at maximum available price:
-−(*P**c**o**r* − *m**r**k**u**p*)\*(*s**u**p**p**l**y*/*k* \* 20000)\*20000 + +*P**c**o**r* \* *I**n**v*/*k* − *P*.*p**r**v*.*a**u**c* \* *I**n**v*/*k*
+−(*P**c**or* − *m**r**k**u**p*)x(*s**u**p**p**ly*/*k* x 20000)\x20000  +*P**c**or* x* *I**n**v*/*k* − *P*.*p**r**v*.*a**u**c* x *I**n**v*/*k
 
 The last payoff, takes the fact that in case of equal bids, the supply
 would be divided equally to bidders into account. As we will see this
@@ -396,16 +396,16 @@ For having a strictly dominant strategy, the second payoff should be
 strictly larger than first one. Also the third term should be strictly
 larger than second term.
 
-*I**n**v*/*k* &gt; ((*P**c* − *P**b**c*)\*20000)/(*P**c* − *P**b**c*)
+*I**n**v*/*k* &gt; ((*Pc* − *P**b**c*)\*20000)/(*Pc* − *P**b**c*)
 
-*I**n**v*/*k* &gt; ( − (*P**c* − *m**r**k**u**p*)\*20000 + (*P**c**o**r* − *m**r**k**u**p*)\*(*s**u**p**p**l**y*/20000 \* *k*)\*20000)/(*P**c**o**r* − *P**c*)
+*I**n**v*/*k* &gt; ( − (*Pc* − *m**r**k**u**p*)\*20000 + (*P**c**or* − *m**r**k**u**p*)\*(*s**u**p**p**ly*/20000 \* *k*)\*20000)/(*P**c**or* − *Pc*)
 
 The first inequality reduces to Inv/k being bigger than minimum position
 which is 20 Tons.
 
 If we neglect the mark-up term, the second inequality would be:
 
-*I**n**v*/*k* &gt; 20000 \* (*P**c**o**r* \* (*s**u**p**p**l**y*/*k* \* 20000)) − *P**c*)/(*P**c**o**r* − *P**c*)
+*I**n**v*/*k* &gt; 20000 \* (*P**c**or* \* (*s**u**p**p**ly*/*k* \* 20000)) − *Pc*)/(*P**c**or* − *Pc*)
 
 It means if the supply over aggregate demand being low enough, then the
 inequality is holding even for very small per player inventory. In other

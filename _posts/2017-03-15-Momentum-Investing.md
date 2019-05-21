@@ -155,8 +155,7 @@ Conclusion
 ----------
 
 As I thought the short part of the momentum investing is not good for
-Tehran Stocks, the inflation just make it not reasonable (oh, non! I
-forgot that I cannot go short in this market at all :) ). For the long
+Tehran Stocks, the inflation just make it not reasonable. For the long
 part, except momentum with 3 month window that excludes last month
 (m.3.L), the rest both fails to catch with GDP deflator and VLGI. Even
 m.3.L shows less cumulative return than VLGI. And there exist a long

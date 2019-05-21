@@ -17,7 +17,7 @@ by time. This property is of utmost beauty in my mind. During the time I
 was serving as a lieutenant, I had lots of spare time and I had the
 opportunity to read "Term-Structure Models, A Graduate Course" by Damir
 Filipovic. Now that I am in active search for a job, I have enough spare
-time to see some of the models of this book.
+time to estimate some of the models of this book.
 
 In Tehran, they have introduced futures on gold coins few years ago. I
 will try to fit some models on their term structure during next
@@ -317,7 +317,7 @@ Lets see whether typical features of term structure occurs here or not.
 </tbody>
 </table>
 
-It seems to me that level slope and curvature exits. Yet level looks a
+It seems to me that level, slope and curvature exits. Yet level looks a
 bit upward at the begining which is not very satisfactory. Also de-correlation occurs
 significantly.
 

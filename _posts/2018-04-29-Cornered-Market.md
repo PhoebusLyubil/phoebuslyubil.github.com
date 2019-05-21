@@ -379,14 +379,18 @@ value of its inventory:
 minimum position = 20000 Kg payoff in case of bidding at base price:
 
 −(*P**b**c* − *m**r**k**u**p*)\*20000 + *P**b**c* \* *I**n**v*/*k* − *P*.*p**r**v*.*a**u**c* \* *I**n**v*/*k*
-*s*.*t. : k x  20 &lt;= *supply
+
+*s*.*t. : k x  20 &lt;= supply
 
 payoff in case of an increase in bid equal to average increase:
+
 −(*Pc* − *m**r**k**u**p*)\*20000 + *Pc* \* *I**n**v*/*k* − *P*.*p**r**v*.*a**u**c* \* *I**n**v*/*k*
-*s*.*t. : *k x  20 = *s**u**p**p**ly*
+
+*s*.*t. : k x  20 = supply
 
 payoff in case of bidding at maximum available price:
-−(*P**c**or* − *m**r**k**u**p*)x(*s**u**p**p**ly*/*k* x 20000)\x20000  +*P**c**or* x* *I**n**v*/*k* − *P*.*p**r**v*.*a**u**c* x *I**n**v*/*k
+
+−(*P**c**or* − *m**r**k**u**p*) x (*s**u**p**p**ly*/*k* x  20000) x 20000  +*P**c**or* x* *I**n**v*/*k* − *P*.*p**r**v*.*a**u**c* x *I**n**v*/*k
 
 The last payoff, takes the fact that in case of equal bids, the supply
 would be divided equally to bidders into account. As we will see this

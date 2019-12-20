@@ -9,6 +9,16 @@ title:
 
 ![Whirlpool ensemble](../img/paintings/Whirlpool ensemble.JPG)
 
+
+#### Train trip 2
+
+![Train trip 2](../img/paintings/traintrip2.jpg)
+
+
+#### Train trip 1
+
+![Train trip 1](../img/paintings/traintrip1.jpg)
+
 #### Transmutation 
 
 ###### For a little fun, rotate the painting :))

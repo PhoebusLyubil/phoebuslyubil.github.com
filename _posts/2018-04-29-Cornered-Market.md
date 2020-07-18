@@ -440,24 +440,23 @@ data:
     ##            min.per.Inv0075
     ## 2018-04-17       -457190.2
 
-Oh, these are pretty fascinating results. I am so excited :))
+Oh, these are pretty fascinating results :))
 
-Given the data, strictly dominant strategy would be choose.
+Given the data, strictly dominant strategy will be choosen.
 
 Conclusion
 ----------
 
 It seems that under special circumstances that total speculative
 inventory is high enough, decision to cornering market is strictly
-dominant strategy, regardless of what was the price in market before
-holidays.
+dominant strategy, regardless of previous price.
 
-If inventories of speculative traders meet this criterion there is
+If inventories of speculative traders meet above criterion there is
 incentive to bid at highest available price. So by the time that
 inventories get consumed for producing products, cornering the market
 could continue. A decrease in prices due to importing of commodities
-from gulf countries could change the assumptions, yet due to new
-regulations in Forex market, it do not seem to happen.
+from gulf countries could change the assumptions, yet giveno new
+regulations in Forex market, it does not seem to happen.
 
 ###### *Please inform me about your feedback, I will be deeply grateful for that :)*
 

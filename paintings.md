@@ -33,10 +33,6 @@ title:
 
 ![Port](../img/paintings/port.JPG)
 
-#### Zukhra
-
-![Zukhra](../img/paintings/Zukhra.jpg)
-
 #### Enchaine
 
 ![Enchaine](../img/paintings/Enchaine.jpg)

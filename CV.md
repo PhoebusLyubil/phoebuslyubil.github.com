@@ -15,9 +15,9 @@ Tehran
 
 <msdebadi777@gmail.com>
 
-[LinkedIn](%22http:/www.linkedin.com/in/masoud-ebadi-kivaj-0a67256b/%22)
+[LinkedIn](http:/www.linkedin.com/in/masoud-ebadi-kivaj-0a67256b/)
 
-[Website](%22https://phoebuslyubil.github.io%22)
+[Website](https://phoebuslyubil.github.io)
 
 Professional Experiences
 ------------------------
@@ -69,7 +69,7 @@ Computer Skills
 Hobbies & Interests
 -------------------
 
--   [Oil painting](%22https://phoebuslyubil.github.io/paintings/%22)
+-   [Oil painting](https://phoebuslyubil.github.io/paintings/)
 -   Travelling
 -   Cooking
 -   Morning walk

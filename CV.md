@@ -27,6 +27,13 @@ Professional Experiences
 **Trader** Freelance *Trading equities and managing individual
 portfolios in Tehran Stock Exchange*
 
+Sharp ratios:
+
+-   2020Q2 - 2021Q2: [4.86](https://phoebuslyubil.github.io/2021-06-14-Performance-analysis-2020-04-05-to-2021-04-05/)
+-   2019Q2 - 2020Q2: [3.24](https://phoebuslyubil.github.io/2020-07-15-Performance-analysis-2018-04-05-to-2020-04-05/)
+-   2018Q2 - 2019Q2: [2.4](https://phoebuslyubil.github.io/2020-07-15-Performance-analysis-2018-04-05-to-2020-04-05/)
+-   2017Q2 - 2018Q2: [1.93](https://phoebuslyubil.github.io/2018-04-16-Perfomance-Analysis-2017-04-05-to-2018-04-05/)
+
 ###### 2015- Mar: 2017-Jan
 
 **Lieutenant** IRIAF (Iran Air Force), Tehran, Iran *Compulsory military

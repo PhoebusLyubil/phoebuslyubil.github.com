@@ -10,6 +10,18 @@ title:
 ![Whirlpool ensemble](../img/paintings/Whirlpool ensemble.JPG)
 
 
+#### Mr NZ
+
+![Mr NZ](../img/paintings/2021/Mr NZ.jpg)
+
+#### Fishmagedon
+
+![Train trip 2](../img/paintings/2021/Fishmagedon.jpg)
+
+#### Curves I
+
+![Train trip 2](../img/paintings/2021/Curves I.jpg)
+
 #### Train trip 2
 
 ![Train trip 2](../img/paintings/traintrip2.jpg)

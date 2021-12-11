@@ -11,7 +11,7 @@ Masoud Ebadi Kivaj
 <img align="right" width="27%" src="../img/CV photo/IMG_2917_2.jpg">
 June/22/1988 
 
-Tehran
+Moscow
 
 <msdebadi777@gmail.com>
 
@@ -47,6 +47,12 @@ in R)*
 
 Education
 ---------
+
+###### 2021-Sep:
+
+**Master in Strategic Corporate Finance** Higher
+School of Economics, Russia
+
 
 ###### 2011-2013
 

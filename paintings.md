@@ -16,11 +16,11 @@ title:
 
 #### Fishmagedon
 
-![Train trip 2](../img/paintings/2021/Fishmagedon.jpg)
+![Fishmagedon](../img/paintings/2021/Fishmagedon.jpg)
 
 #### Curves I
 
-![Train trip 2](../img/paintings/2021/Curves I.jpg)
+![Curves I](../img/paintings/2021/Curves I.jpg)
 
 #### Train trip 2
 

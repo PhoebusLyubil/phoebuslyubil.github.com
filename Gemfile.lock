@@ -6,7 +6,7 @@ PATH
       jekyll-paginate (~> 1.1)
       jekyll-sitemap (~> 1.4)
       kramdown-parser-gfm (~> 1.1)
-      tzinfo (= 1.2.3)
+      tzinfo (= 2.0.5)
       tzinfo-data (= 1.2017.2)
 
 GEM
@@ -22,8 +22,8 @@ GEM
     eventmachine (1.2.7)
     eventmachine (1.2.7-x64-mingw32)
     ffi (1.15.5)
-    ffi (1.15.5-x64-mingw-ucrt)
     ffi (1.15.5-x64-mingw32)
+    ffi (1.15.5-x64-unknown)
     forwardable-extended (2.6.0)
     http_parser.rb (0.8.0)
     i18n (0.9.5)
@@ -72,17 +72,16 @@ GEM
     sass-listen (4.0.0)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
-    thread_safe (0.3.6)
-    tzinfo (1.2.3)
-      thread_safe (~> 0.1)
+    tzinfo (2.0.5)
+      concurrent-ruby (~> 1.0)
     tzinfo-data (1.2017.2)
       tzinfo (>= 1.0.0)
     webrick (1.7.0)
 
 PLATFORMS
   ruby
-  x64-mingw-ucrt
   x64-mingw32
+  x64-unknown
 
 DEPENDENCIES
   beautiful-jekyll-theme!

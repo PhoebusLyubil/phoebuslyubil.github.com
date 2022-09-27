@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "jekyll-paginate", "~> 1.1"
   spec.add_runtime_dependency "jekyll-sitemap", "~> 1.4"
   spec.add_runtime_dependency "kramdown-parser-gfm", "~> 1.1"
-  spec.add_runtime_dependency 'tzinfo', '1.2.3'
+  spec.add_runtime_dependency 'tzinfo', '2.0.5'
   spec.add_runtime_dependency 'tzinfo-data', '1.2017.2'
 
   spec.add_development_dependency "bundler", ">= 1.16"

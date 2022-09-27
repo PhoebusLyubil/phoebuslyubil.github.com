@@ -1,0 +1,154 @@
+I"�<h2 id="benchmark-part-ii">Benchmark Part II</h2>
+
+<p>For Constantly Rebalanced Portfolio (hereafter CPR) same distribution of
+weights is used for all periods. Since CPR uses all the available data,
+it is a rather omniscient benchmark that uses least effort. I use
+monthly returns to compute the optimal weights for CPR wealth factor <img src="http://chart.apis.google.com/chart?cht=tx&amp;chl=\prod_{t=1}^{n} \sum_{i=1}^{m} w_{i} r_{tj}" alt="f1" /> in which <em>m</em> is number
+of stocks and <em>w</em><sub><em>i</em></sub>s are their respective weight.</p>
+
+<p>Since newly introduced stocks are numerous I use the same method as
+before for computing 3/4 most traded stocks for the six month period
+ended at “2014-03-21” as the basis for computation.</p>
+
+<p>Preparing data like previous post and getting monthly returns. Then
+changing its shape to wide form so matrix algebra becomes a lot easier:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>source("C:/Users/msdeb/Documents/Stock and trades/functions.R")
+
+# replacing NA with last observation
+WDATA_last&lt;- ddply(WDATA, .(sym), colwise(NA_last_obs, 
+                                          c("CLOSE", "retCL_t", "VOL")))
+
+WDATA_last$DATE&lt;- WDATA$DATE
+
+# subseting data and finding most traded stocks 
+date_data&lt;- c(seq.Date(from = as.Date("2001-03-21"), to = Sys.Date(), by = "2 quarter"), Sys.Date())
+
+sub_year_data&lt;- list()
+for(i in 2: length(date_data)){
+  sub_data&lt;- subset(WDATA, WDATA$DATE &lt; date_data[i] &amp; WDATA$DATE &gt;= date_data[i-1])
+  sub_year_data[[i-1]]&lt;- ddply(sub_data, 'sym', .fun = function(x) data_NA_rm(x), .progress = "tk")
+}
+
+portion.sym&lt;- llply(sub_year_data, function(x) sort_base_index(x, n.var = 3/4))
+
+
+sub_index_data&lt;- WDATA_last[WDATA_last$sym %in% as.factor(portion.sym[[26]]),]
+sub_index_data&lt;- sub_index_data[ complete.cases(sub_index_data$CLOSE),]
+sub_index_data&lt;- subset(sub_index_data , sub_index_data$DATE &gt;= date_data[27])
+date_month&lt;- c(seq.Date(from = as.Date("2001-03-21"), to = Sys.Date(), by = "month"), Sys.Date())
+
+# monthly data: end of month
+sub_data.month&lt;- sub_index_data[(sub_index_data$DATE %in% date_month),]
+sub_data.month&lt;- droplevels(sub_data.month)
+# computing monthly returns
+t&lt;- dlply(sub_data.month, 'sym', function(x) PerChange((x$CLOSE)))
+sub_data.month$ret.month&lt;- unlist(t)
+rm(t)
+
+# Reshaping data
+retDATAw&lt;- reshape(sub_data.month[,c(1,5,6)], timevar = "DATE", idvar = "sym", direction = "wide")
+retDATAw &lt;- t(retDATAw)
+colnames(retDATAw) &lt;- retDATAw[1,]
+retDATAw &lt;- retDATAw[-1,]
+J&lt;- rownames(retDATAw)
+J&lt;- matrix(unlist(strsplit(J, split= "[.]")), ncol=3,byrow=T)[,3]
+retDATAw&lt;- apply(retDATAw,2, function(x) as.numeric(x))
+# removing first NA introduced by differencung
+retDATAw&lt;- retDATAw[-1,]
+</code></pre></div></div>
+
+<p>By next function I find the optimal weights for CPR. Since number of
+variables are more than 250, I increase the number of iterations for
+optim function.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CPR_weights&lt;- function(data = retDATAw, w = weigths){
+  w &lt;- w/sum(w)
+ portfo_return&lt;- (1 +retDATAw) %*% w
+ CPR_return&lt;- cumprod( portfo_return)
+ CPR_return&lt;- CPR_return[ length( CPR_return)]
+ weight_penalty&lt;- (10000* (1 - sum( w))) ^ 2
+ negative_penalty&lt;- -sum( w[ w &lt; 0])
+ obj&lt;- -(CPR_return) + weight_penalty + negative_penalty
+ return( obj)
+}
+
+opt_CPR&lt;- optim(  par = c(rep(1, 262)), CPR_weights, data = retDATAw, method  = "L-BFGS-B",
+             lower   = 0, control = list(maxit = 1000),
+             upper   = 1) 
+
+
+
+path = "C:/Users/msdeb/Documents/Stock and trades/"
+setwd(path)
+save.image()
+</code></pre></div></div>
+
+<p>Since inflation is high, the term <code class="language-plaintext highlighter-rouge">w &lt;- w/sum(w)</code> need to be there so
+the objective function won’t seek UFOs in the sky :) If we use <code class="language-plaintext highlighter-rouge">cumsum</code>
+instead of <code class="language-plaintext highlighter-rouge">cumprod</code> there would be no need for that term.</p>
+
+<p>Then weights for optimal CPR, equal weights for CPR are computed and
+related returns are computed. I also computed VLGI for comparisons.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>w&lt;- opt_CPR$par/sum(opt_CPR$par)
+portfo_return&lt;- (1 +retDATAw) %*% w
+CPR_return&lt;- cumprod( portfo_return)
+CPR_return&lt;- as.xts(CPR_return, order.by = as.Date(J[-1]))
+
+
+w.equal&lt;- c(rep(1/262, 262))
+portfo_return.equal&lt;- (1 +retDATAw) %*% w.equal
+CPR_return.equal&lt;- cumprod( portfo_return.equal)
+CPR_return.equal&lt;- as.xts(CPR_return.equal,
+                          order.by = as.Date(J[-1]))
+
+WDATA_last$r.C&lt;- ddply(WDATA, .(sym), colwise(ratio.close, c("CLOSE")))[,2]
+WDATA_last$DATE&lt;- as.Date(WDATA$DATE)
+index.VLGI&lt;- index.maker(WDATA. = WDATA, WDATA_last. = WDATA_last)
+index.VLGI&lt;- as.data.frame(index.VLGI)
+index.VLGI$DATE &lt;- as.Date(index.VLGI$DATE)
+index.VLGI&lt;- as.xts(index.VLGI$VLGI, order.by = index.VLGI$DATE)
+colnames(index.VLGI)&lt;- c( "VLGI")
+</code></pre></div></div>
+
+<h3 id="results">Results</h3>
+
+<p>The results for optimal CPR weights are:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>##        Aluminum R.-a Cultur.Herit. Inv.-a     Dr. Abidi Lab.-a 
+##          0.027529633          0.185255685          0.559913093 
+##    Parsian Oil&amp;Gas-a         Saipa Azin-a 
+##          0.218565318          0.008736271
+</code></pre></div></div>
+
+<p>It is interesting that among 262 stocks just 5 of them get chosen and
+future just 4 of them have weights more than 1 percent. <em>(I ve seen
+anomal volumes in first two and forth one, maybe this could explain it,
+yet this is a in-sample analysis. For furthure analysis I need to change
+it to an out-of-sample one, if again these companies exist then the
+anomalities could be partly exlained)</em></p>
+
+<p>Lets see how the plots for daily rebalanced portfolio by the optimal CPR
+monthly weights look. Values for VLGI are divided by its value at first
+day and multiplied by first value of optimal CPR so we have the same
+scale.</p>
+
+<p><img src="../img/CPR.png" alt="" /></p>
+
+<p>Contrary to my expectations, equal weight CPR is worse than VLGI.
+Optimal CPR generally have better results than VLGI. It also suffers
+from very sharp drawdown at the end of the chart. Its derivation could
+be result of sharp increase at the end of chart so if we use
+out-of-sample computations another set of weights would be computed.</p>
+
+<p>If I use Optimal CPR as a benchmark, I think the results would be
+depressive :)) , for sure I cannot beat that, but it could be a good to
+compare with it, so I would have an eye on it. Before that I need to
+make it semi online, or compute it with predictory purposes. I would do
+that in another post.</p>
+
+<h6 id="please-inform-me-about-your-feedback-i-will-be-deeply-grateful-for-that-"><em>Please inform me about your feedback, I will be deeply grateful for that :)</em></h6>
+
+<h6 id="for-disclaimer-please-see-about-page">For disclaimer please see about page.</h6>
+:ET

@@ -1,0 +1,308 @@
+I"(<h2 id="external-facors">External facors</h2>
+
+<p>In last post I show that some external factors like sanctions, lifting
+them, and expectations about them could lead to sharp and extreme
+reaction in Tehran Stock Exchange. Absence of short selling, options and
+futures on Forex, makes it pretty difficult to hedge against these
+extreme and <strong>frequent</strong> drawdowns. These could easily damage any
+retirement account, mine is not excluded. So, I thought about how to
+hedge my account against them, and it took me some time to get to a
+desirable results.</p>
+
+<p>My observations about this matter is as follows:</p>
+
+<ul>
+  <li>I am a resident of Tehran, as a result I have no access to
+international markets
+    <ul>
+      <li>liquid tradeable assets are Foreign Exchange, gold, bond with
+Rial numerair and Stocks</li>
+    </ul>
+  </li>
+  <li>Regional Economy is highly depended on oil exports and as a result
+dollar reserves</li>
+  <li>External factors that are bad for economy have several results:
+    <ul>
+      <li>Export oriented companies have difficulties</li>
+      <li>Export and import companies gain from barter transactions</li>
+      <li>Last two depends o whether they are subject to sanctions or not</li>
+      <li>What is bad for companies means less supply for foreign exchange
+and subsequently devaluation of Rial</li>
+    </ul>
+  </li>
+  <li>Both Forex and stock market could be manipulated by authorities
+sooner or later</li>
+</ul>
+
+<p>I could consider these and <em>AHA</em> why not seeing the relationship between
+lags and leads of USDIRR and VLGI? By the way my numeraire is Rial, so
+there would not be much hassle to consider USDIRR and it is by PPP
+immune to inflation in long run. So lets put <em>another brick in the
+wall</em>.</p>
+
+<h3 id="data">Data</h3>
+
+<p>Getting data for USDIRR is a bit tricky. First of all, we need to take
+the “free market rate” and not the official rates for that, the second
+is not simply tradable for individuals like me.
+<a href="http://demru.com/fa/index">http://demru.com/fa/index</a> provide some old dated data. For completing
+it I used “RSelenium” to extract each days data from
+<a href="http://www.sanarate.ir/">http://www.sanarate.ir/</a> and combining it together. This second source
+is much more exact than the first, yet it has its hassle and needs
+Selenium for getting the data.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>path = "C:/Users/msdeb/Documents/Stock and trades/"
+setwd(path)
+load(".RData")
+
+source("C:/Users/msdeb/Documents/Stock and trades/functions.R")
+
+index.VLGI&lt;- index.maker(WDATA. = WDATA, WDATA_last. = WDATA_last)
+index.VLGI&lt;- as.data.frame(index.VLGI)
+index.VLGI$DATE &lt;- as.Date(index.VLGI$DATE)
+index.VLGI&lt;- as.xts(index.VLGI$VLGI, order.by = index.VLGI$DATE)
+colnames(index.VLGI)&lt;- c( "VLGI")
+summary(index.VLGI)
+
+X_rates63&lt;- read.csv("C:/Users/msdeb/OneDrive/data/Forex/usdirr63.CSV")
+colnames(X_rates63)&lt;- c("DATE", "ind")
+X_rates63$DATE &lt;- as.Date(X_rates63$DATE, "%Y/%m/%d")
+X_rates63&lt;- as.xts(X_rates63$ind, order.by = X_rates63$DATE)
+colnames(X_rates63)&lt;- c( "USD")
+
+
+
+X_rates&lt;- read.csv("C:/Users/msdeb/OneDrive/data/Forex/sana_rates.CSV")
+
+# 24:00 stands for all day average
+
+hours_average&lt;- c("08:00","09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"
+                  , "17:00", "24:00")
+X_rates_hourly&lt;- cbind(X_rates, hour= hours_average )
+X_rates_16&lt;- subset(X_rates_hourly, X_rates_hourly$hour == c("16:00"))
+X_rates_24&lt;- subset(X_rates_hourly, X_rates_hourly$hour == c("24:00"))
+X_rates_16[,1]&lt;-as.Date(X_rates_16[,1], "%m/%d/%Y")
+X_rates_24[,1]&lt;-as.Date(X_rates_24[,1], "%m/%d/%Y")
+
+USDIRR_16&lt;- X_rates_16[,c(1:2)]
+USDIRR_16&lt;- as.xts(USDIRR_16$USD, order.by = USDIRR_16$X)
+colnames(USDIRR_16)&lt;- c( "USD")
+USDIRR_24&lt;- X_rates_24[,c(1:2)]
+USDIRR_24&lt;- as.xts(USDIRR_24$USD, order.by = USDIRR_24$X)
+colnames(USDIRR_24)&lt;- c( "USD")
+USDIRR16&lt;- rbind(X_rates63['::2015-06-19'],USDIRR_16)
+USDIRR24&lt;- rbind(X_rates63['::2015-06-19'],USDIRR_24)
+
+
+dataDI&lt;- merge.xts(USDIRR24,index.VLGI)
+tail(dataDI)
+
+plot.xts(log(dataDI$USD), main =  "USDIRR")
+
+path = "C:/Users/msdeb/Documents/Stock and trades/"
+setwd(path)
+save.image()
+</code></pre></div></div>
+
+<p>Here is what the USDIRR from these two sources looks like (yes! we need
+logarithmic scale for it :) :</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tail(USDIRR24)
+
+##                USD
+## 2016-12-23      NA
+## 2016-12-24 39796.5
+## 2016-12-25 40365.0
+## 2016-12-26 40716.5
+## 2016-12-27 41155.0
+## 2016-12-28 40878.0
+
+plot.xts(log(dataDI$USD), main =  "log USDIRR")
+</code></pre></div></div>
+
+<p><img src="../img//USDIRR.png" alt="" /></p>
+
+<p>We clearly see structural breaks in this series, and the cause is
+existence of system of different exchange rates (official or fee
+market), or system of pegged foreign exchange rate. As a result I would
+use the data after “2009-01-01” so the structural breaks would not be a
+problem. After this date free market rate and official one shows
+differences.</p>
+
+<h3 id="negative-relation">negative relation</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dataDI&lt;- dataDI[complete.cases(dataDI$VLGI),]
+dataDI&lt;- dataDI[complete.cases(dataDI$USD),]
+dataDI$DUSD&lt;- diff(log(dataDI$USD))
+dataDI$DVLGI&lt;- diff(log(dataDI$VLGI))
+
+attr(dataDI, "frequency") &lt;- 1
+dataDI&lt;- dataDI['2009-01-01::']
+
+# monthly data
+mdataDI&lt;- cbind(to.monthly(dataDI$USD)[,4],to.monthly(dataDI$VLGI)[,4])
+colnames(mdataDI)&lt;- colnames(dataDI)[1:2]
+mdataDI$DUSD&lt;- diff(log(mdataDI$USD))
+mdataDI$DVLGI&lt;- diff(log(mdataDI$VLGI))
+
+# adding lags
+
+
+mdataDI$L_3DUSD&lt;- (lag.xts(mdataDI$DUSD, k = 3))
+mdataDI$L_2DUSD&lt;- (lag.xts(mdataDI$DUSD, k = 2))
+mdataDI$L_1DUSD&lt;- (lag.xts(mdataDI$DUSD, k = 1))
+mdataDI$L1DUSD&lt;- (lag.xts(mdataDI$DUSD, k = -1))
+mdataDI$L2DUSD&lt;- (lag.xts(mdataDI$DUSD, k = -2))
+mdataDI$L3DUSD&lt;- (lag.xts(mdataDI$DUSD, k = -3))
+
+dataDI&lt;- dataDI[complete.cases(dataDI$DVLGI),]
+mdataDI&lt;- mdataDI[complete.cases(mdataDI$DVLGI),]
+</code></pre></div></div>
+
+<p>Now I need to condition the data based on the times that market return
+was negative. This include negative return that are more inclusive than
+just negative returns based on external factors. We do that and compute
+HAC standard errors for OLS.</p>
+
+<table style="width:79%;">
+<caption>Fitting linear model: DVLGI ~ L3DUSD - 1</caption>
+<colgroup>
+<col width="18%" />
+<col width="15%" />
+<col width="18%" />
+<col width="13%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">Estimate</th>
+<th align="center">Std. Error</th>
+<th align="center">t value</th>
+<th align="center">Pr(&gt;|t|)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>L3DUSD</strong></td>
+<td align="center">-0.4157</td>
+<td align="center">0.1179</td>
+<td align="center">-3.527</td>
+<td align="center">0.00142</td>
+</tr>
+</tbody>
+</table>
+
+<table style="width:85%;">
+
+<colgroup>
+<col width="20%" />
+<col width="30%" />
+<col width="11%" />
+<col width="22%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Observations</th>
+<th align="center">Residual Std. Error</th>
+<th align="center"><span class="math inline"><em>R</em><sup>2</sup></span></th>
+<th align="center">Adjusted <span class="math inline"><em>R</em><sup>2</sup></span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">30</td>
+<td align="center">0.05132</td>
+<td align="center">0.3002</td>
+<td align="center">0.2761</td>
+</tr>
+</tbody>
+</table>
+
+<table style="width:81%;">
+<caption>Fitting linear model: DVLGI ~ L_3DUSD - 1</caption>
+<colgroup>
+<col width="19%" />
+<col width="15%" />
+<col width="18%" />
+<col width="13%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">Estimate</th>
+<th align="center">Std. Error</th>
+<th align="center">t value</th>
+<th align="center">Pr(&gt;|t|)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>L_3DUSD</strong></td>
+<td align="center">-0.4644</td>
+<td align="center">0.1871</td>
+<td align="center">-2.482</td>
+<td align="center">0.0189</td>
+</tr>
+</tbody>
+</table>
+
+<table style="width:85%;">
+
+<colgroup>
+<col width="20%" />
+<col width="30%" />
+<col width="11%" />
+<col width="22%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Observations</th>
+<th align="center">Residual Std. Error</th>
+<th align="center"><span class="math inline"><em>R</em><sup>2</sup></span></th>
+<th align="center">Adjusted <span class="math inline"><em>R</em><sup>2</sup></span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">31</td>
+<td align="center">0.05541</td>
+<td align="center">0.1703</td>
+<td align="center">0.1427</td>
+</tr>
+</tbody>
+</table>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## 
+## t test of coefficients:
+## 
+##         Estimate Std. Error t value Pr(&gt;|t|)  
+## L_3DUSD -0.46441    0.19014 -2.4425  0.02069 *
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+## 
+## t test of coefficients:
+## 
+##         Estimate Std. Error t value  Pr(&gt;|t|)    
+## L3DUSD -0.415719   0.075202  -5.528 5.855e-06 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+</code></pre></div></div>
+
+<p>So we see negative relation that is significant for lag and leads of 3
+months.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>My guesses are not rejected and the VLGI could be hedged by using
+USDIRR. It need a pretty active monthly management since movement in
+USDIRR could be sooner or later than the shocks in VLGI (it could be
+figured out by looking at the news and seeing were authorities have
+intertwined firstly).</p>
+
+<h6 id="please-inform-me-about-your-feedback-i-will-be-deeply-grateful-for-that-"><em>Please inform me about your feedback, I will be deeply grateful for that :)</em></h6>
+
+<h6 id="for-disclaimer-please-see-about-page">For disclaimer please see about page.</h6>
+:ET

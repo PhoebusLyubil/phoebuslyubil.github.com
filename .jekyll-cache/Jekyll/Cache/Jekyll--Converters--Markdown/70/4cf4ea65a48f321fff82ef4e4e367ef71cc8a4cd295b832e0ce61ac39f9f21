@@ -1,0 +1,566 @@
+I"�V<h2 id="intro">Intro</h2>
+
+<p>This year’s macroeconomics and investment environments were similar to
+the previous year’s environments. Substantial increase in price levels,
+high variance of prices, and outstanding geopolitical risks were
+prevalent. While raw material and refinery export improved compared to
+the last years, in terms of quantity it was less than their long term
+averages. After some changes in export procedures by the state, prices
+of exported petrochemical compared to domestic ones increased and and
+the gap between the two narrowed. M1 and M2 continued their increase at
+high rates, and M1 saw unprecedented growth values. This was partly
+caused by budget deficits and, to some extent, by an increase in banks’
+free reserves following slowdowns in economic activity which itself stem
+from hindering measures aimed at containing the spread of Covid-19.
+Stock market’s surge continued and higher nominal values were recorded
+for Overall Index. Yet any expectations of structural changes and
+imagination that stocks will be valued by considering longer term cash
+flows deemed to be in vain. Government officials invited people to
+invest in stock market and the number of investors increased day by day.
+At August government, social security and corporations related to
+welfare ministry flooded the local stock market with stocks. Increase in
+supply or a neglect over market impact effects led to a market crash.
+Some of the private equity funds had perfect timing before and on the
+day of the crash.</p>
+
+<p>An event before market crash was a statement by 25 “concerned economist”
+claiming that stock market “is the cause of the inflation”, and they
+“urgently demanded” that “a third of government stocks ought to be sold
+immediately” and that the government could lessen the budget deficit by
+that. Using back of envelop calculations and considering an average free
+float of 0.2, the prescribed number was around 7 to 8 percentage of free
+float of listed stocks in Tehran Stock Exchange. Some of those 25
+“economist” have some nice papers in top ten journals. Given their track
+records, we are still waiting for the proof of their claim that stock
+market growth leads to inflation. Before and after the advised
+intervention money multiplier was around 7.5 and it did not changed
+afterward. Further as basic economic models says, increase in number of
+transactions has negative effect on price levels, ceteris paribus.
+Inflation and money supply, which a number of them assertively claimed
+that it is strictly endogenous, increased after their advice was
+implemented. This all said, I am one of the economics graduates that
+still wait for their research papers on this issue. This revolutionary
+idea of theirs, if proved, is as revolutionary as marginalism revolution
+in economics. But I wonder how they are going to prove that inflation is
+not a monetary phenomenon and it is a stock market phenomenon :D I wish
+them lots of luck for doing the impossible :)</p>
+
+<p>During the performance analysis period, geopolitical risks heightened.
+USA presidential elections and subsequent change in expectations of
+future sanction environment was an added uncertainty. mentioned risks
+and uncertainties, stock market crash, and signs of a stagnant real
+state market resulted in a 70 percent increase in check-able and
+redeemable accounts amount in November. This is while inflation was 30.5
+percent and saving deposit amount growth was less than 2 percent
+(numbers are on a 12 month basis, November 2020 compared to November 2021. The numbers for EOY of Iranian calender, 3rd week of March, was
+68.6 percent for check-able accounts, 56.6 percent for redeemable
+accounts, 43 percent for short term saving deposits and negative growth
+for long term saving deposits, and inflation was 36.2 percent. These
+changes are in line with the stated conclusion). Talks about lifting
+sanction with new USA administration began in January and it is still
+ongoing. After mid-February very strict price limits laws were
+introduced. Presumably so the newly appointed chief of local Stock
+Exchange could buy time for decision making by himself and in hope of
+good news. Which in action eroded market liquidity.</p>
+
+<p>Canceled plans for relocation and the profit opportunity, led me to
+raise capital for the portfolio. Seeing the imminent crash, I cashed in
+6/10 of the equity holding. Predicting the market will fall, and given
+that the local market almost just has a buy-side, I traded much less and
+devoted my time to studying for GRE and IELTS exams. There was a
+possibility of buying put options on some stocks. Those options are
+neither liquid assets nor most of their writers were institutional. I
+read that option writers had problems depositing adjusted option margins
+in August. Hence, I forgo buying put options.</p>
+
+<p>All in all, the structural change that I hoped for did not happen.
+Secondly, pension funds where better off by selling assets at higher
+prices.</p>
+
+<p>Lets take a look at performance metrics for this period.</p>
+
+<h3 id="charts-and-measurements">Charts and measurements</h3>
+
+<h4 id="charts-indices">Charts: Indices</h4>
+
+<p>For comparison I used four of the indexes that are provided by Tehran
+Stock Exchange. Concise definition of them are:</p>
+
+<ul>
+  <li>
+    <p>Total Equal weight Pr: Based on prices of listed stocks. Equal
+weight is given to prices.</p>
+  </li>
+  <li>
+    <p>Overall Index: Based on market cap weighted adjusted prices of
+listed stocks, dividends and IPOs are included.</p>
+  </li>
+  <li>
+    <p>Top 30 Index: Only includes 30 biggest companies.</p>
+  </li>
+  <li>
+    <p>Top 50 Index: Only includes 30 biggest companies.</p>
+  </li>
+</ul>
+
+<p>Last two indices have survivorship bias. Due to some local market rules,
+some stocks are closed for trading for specific predefined or unspecific
+predefined time :) For example after disclosing information, or a fifty
+percent increase/ decrease in stock price, or reevaluations, they are
+closed for trading. Being closed for trading could last from several
+days to a more than a year. Since these indexes are calculated using
+latest available price, Indices have slightly undervalued variance
+compared to
+<a href="https://phoebuslyubil.github.io/2017-02-05-Benchmark-and-Prediction-Part-I/">VLGI</a>.
+Market cap weighted indices include IPOs from day one of their offering.
+As a result big cap IPOs strongly influence them. Further the Overall
+Index, the main Index, includes dividends. IPO of the main fund of
+Social Security was significant for this Index.</p>
+
+<p><img src="../img/Performance 2020-2021\Index Performance.png" alt="" /></p>
+
+<p>Last year’s observation, <a href="https://phoebuslyubil.github.io/2020-07-15-Performance-analysis-2018-04-05-to-2020-04-05/">divergance between drift term of small and big
+stocks</a>
+, continued till mid August. From mid July till mid August, as I
+mentioned above, around 7-8% of free float of all stocks was sold by big
+funds, government and welfare ministry subordinates including main fund
+of Social Security. Main social security fund itself had an IPO in which
+it offered 10 percent of its existing shares. Since I think social
+security is based on trust of payers and its main duty is notoriety of
+investing borrowed money and reducing payers cautionary savings by law
+of large numbers, I did not consider this an appropriate action. Yet it
+was done. It’s price 7.6 folded. Main Social Security fund sold 2 more
+percent of its stocks at higher values and then, as with many other
+stocks especially big cap ones, its share price sank to 28 percent its
+highest value.</p>
+
+<p>For comparison purposes and reducing the effects of survivorship bias,
+the graph presents both the Top 50 Index and Top 30 Index. While
+starting point and drawdawns of these two indices and Overall Index are
+almost similar, cumulative returns of Top 50 Index, Overall Index, and
+Equal weight price index converge to an approximately similar final
+value. That is to say, some companies did not remain in top 30 market
+cap list and moved to top 50 one. Having in mind that most of top 30 cap
+stocks were state related stocks in beginning of the analysis period
+plus looking at Top 50 Index cumulative returns compared with Top 30
+Index, some traders have imagined a case of pump it and dump it. I
+refrain from this deduction. I mostly think it was the suggestion by
+those so called “25 concerned economist” that resulted in the crash.
+Mass selling by entangled institutions was right after their suggestion
+and the amount of sold stocks matched their prescribed amount. As I said
+before, I am still waiting for their paper in a reputable journal
+proving their novel idea that inflation is a stock market phenomenon and
+not a monetary one :) Who can resist reading such a revolutionary
+research? :) So much against common sense that even in my wildest
+imaginations I can never imagine it would even be written what about
+being published by “25 concerned economist” :D A dark humor is that this
+kind of advice is common in Tehran academic institutions and no one was
+ever held responsible for these kind of claims. I hope one day I see the
+end of self seeking polemics.</p>
+
+<p>Indexes have almost reached to a steady state from mid January.
+Afterward, as with most other drawdowns, relative price adjustments have
+begun. It was as I imagined until local stock exchange chief was
+changed. He introduced +6/-2 percent price limits on daily trading. In
+local market trades are prioritized based on arrival time of orders.
+After a few days people who wanted to sell had difficulties selling
+their stocks. Race to transmit sell limit orders at higher speed at
+stock market opening began. Liquidity nearly vanished to an extent that
+on some days aggregate stock market trading volume reached to a
+twentieth of its value in summer. Market halted and prices fell slowly,
+but steadily. Although, by new US government attitude toward sanctions
+and considerable reduction in geopolitical risks stock prices were
+expected to increase, new price limit rules hindered any foreseeable
+gains. Contemporaneousness of these two event makes quantitative
+evaluations of the former effect by using only stock market data very
+hard.</p>
+
+<p>Another mentionable occurrence was giving rights to sell redistributed
+stocks in 2006. This farther the sell side pressures in July. Rights to
+sell was exercised by brokers as investor agents. Most stock price
+reversals before February was shortly followed by an increase in sell
+side. At such instances, news about redistributed stocks were usually
+released after market hours. Due to lack of public data in my hands, I
+cannot quantify this matter. This data plus data about algos would be
+pretty informative about continuation of falling prices. While algos
+could not submit an order after July, they had access to data. Over
+several occasions, four times, I saw reductions in listed stock prices
+at almost the same time and much faster than human reaction. In all of
+those four cases, a slight decrease in demand for one of top 30 cap
+index was the trigger and massive orders to dump stocks happened in less
+than 4 minutes. Given that algos are newly introduced to the domestic
+market, similarity between their strategies and hence their outcome is
+not a unprecedented occurrence. Anyway, these hypothesizes need data to
+be more than guesses.</p>
+
+<p><img src="../img/Performance 2020-2021\Ret dist.png" alt="" /></p>
+
+<p><img src="../img/Performance 2020-2021\Portfolio Performance.png" alt="" /></p>
+
+<h4 id="charts-portfolio">Charts: Portfolio</h4>
+
+<p>As the chart shows, equity part of the portfolio performed better than
+Overall Index and Top 30 Index. <a href="https://phoebuslyubil.github.io/2017-02-12-Hedging-Against-External-Factors/">negative
+correlation</a>
+between foreign exchange component of the portfolio and indexes
+conditional on external risks seems to reduced overall variation in the
+portfolio. At the stock market peak, I cashed around six-tenth of the
+equity part of the portfolio. The cash plus foreign exchange component
+of the portfolio are the reason that whole portfolio has lower variation
+than indices. This reduced the drawdown and Total Portfolio has lower
+drawdown than the indices.</p>
+
+<h4 id="metrics">Metrics</h4>
+
+<p>Performance metrics for the first period shows a Sharp ratio of 4.86.
+Standard errors are as intended and combining foreign exchange and
+equities reduced SE in portfolio to a lower level than Overall Index.
+Return is around a forth larger than return of Total Equal Weight Price
+Index.</p>
+
+<p>Sharp ratio, Information ratio and max drawdawn of portfolio are
+satisfactory compared to indices.I am happy about them :)</p>
+
+<p>Information ratios of indices are also reported. It was not a necessary
+or an informative act, yet I find the differences interesting. Maybe I
+make a measure based on them.</p>
+
+<table style="width:61%;">
+<colgroup>
+<col width="38%" />
+<col width="11%" />
+<col width="11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">ret</th>
+<th align="center">sd</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>Top 50 Index</strong></td>
+<td align="center">1.172</td>
+<td align="center">0.3886</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>Top 30 Index</strong></td>
+<td align="center">1.722</td>
+<td align="center">0.4212</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>Overall Index</strong></td>
+<td align="center">1.094</td>
+<td align="center">0.3345</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>Total Equal Weight Pr</strong></td>
+<td align="center">1.044</td>
+<td align="center">0.2214</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>FX</strong></td>
+<td align="center">0.621</td>
+<td align="center">0.3458</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>Equity</strong></td>
+<td align="center">2.046</td>
+<td align="center">0.3759</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>Total</strong></td>
+<td align="center">1.286</td>
+<td align="center">0.2412</td>
+</tr>
+</tbody>
+</table>
+
+<table style="width:100%;">
+<colgroup>
+<col width="34%" />
+<col width="17%" />
+<col width="30%" />
+<col width="17%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">Sharp Ratio</th>
+<th align="center">Upside Potential Ratio</th>
+<th align="center">max Drawdown</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>Top 50 Index</strong></td>
+<td align="center">2.737</td>
+<td align="center">1.017</td>
+<td align="center">0.5253</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>Top 30 Index</strong></td>
+<td align="center">3.768</td>
+<td align="center">1.037</td>
+<td align="center">0.5101</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>Overall Index</strong></td>
+<td align="center">2.961</td>
+<td align="center">1.002</td>
+<td align="center">0.4687</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>Total Equal Weight Pr</strong></td>
+<td align="center">4.259</td>
+<td align="center">1.357</td>
+<td align="center">0.3202</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>FX</strong></td>
+<td align="center">1.563</td>
+<td align="center">0.4487</td>
+<td align="center">0.2962</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>Equity</strong></td>
+<td align="center">5.043</td>
+<td align="center">1.068</td>
+<td align="center">0.3287</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>Total</strong></td>
+<td align="center">4.861</td>
+<td align="center">1.107</td>
+<td align="center">0.1862</td>
+</tr>
+</tbody>
+</table>
+
+<table style="width:99%;">
+<colgroup>
+<col width="38%" />
+<col width="29%" />
+<col width="15%" />
+<col width="15%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">Downside Deviation</th>
+<th align="center">VaR</th>
+<th align="center">ES</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>Top 50 Index</strong></td>
+<td align="center">0.01592</td>
+<td align="center">-0.03749</td>
+<td align="center">-0.0479</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>Top 30 Index</strong></td>
+<td align="center">0.01701</td>
+<td align="center">-0.03993</td>
+<td align="center">-0.05123</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>Overall Index</strong></td>
+<td align="center">0.01337</td>
+<td align="center">-0.03201</td>
+<td align="center">-0.04097</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>Total Equal Weight Pr</strong></td>
+<td align="center">0.007304</td>
+<td align="center">-0.0203</td>
+<td align="center">-0.02624</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>FX</strong></td>
+<td align="center">0.01688</td>
+<td align="center">-0.03423</td>
+<td align="center">-0.0435</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>Equity</strong></td>
+<td align="center">0.01276</td>
+<td align="center">-0.03476</td>
+<td align="center">-0.04483</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>Total</strong></td>
+<td align="center">0.007802</td>
+<td align="center">-0.02191</td>
+<td align="center">-0.02837</td>
+</tr>
+</tbody>
+</table>
+
+<table>
+<caption>Table continues below</caption>
+<colgroup>
+<col width="38%" />
+<col width="23%" />
+<col width="18%" />
+<col width="18%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">Free Float Index</th>
+<th align="center">Top_50_Index</th>
+<th align="center">Top_30_Index</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>Information Ratio: Total Equal Weight Pr</strong></td>
+<td align="center">1.395</td>
+<td align="center">0.5091</td>
+<td align="center">2.274</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>Information Ratio: Overall Index</strong></td>
+<td align="center">2.083</td>
+<td align="center">1.082</td>
+<td align="center">4.311</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>Information Ratio: Top 30 Index</strong></td>
+<td align="center">-3.04</td>
+<td align="center">-5.092</td>
+<td align="center">NA</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>Information Ratio: Top 50 Index</strong></td>
+<td align="center">0.8439</td>
+<td align="center">NA</td>
+<td align="center">5.092</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>Information Ratio: Free Float Index</strong></td>
+<td align="center">NA</td>
+<td align="center">-0.8439</td>
+<td align="center">3.04</td>
+</tr>
+</tbody>
+</table>
+
+<table style="width:100%;">
+<caption>Table continues below</caption>
+<colgroup>
+<col width="39%" />
+<col width="20%" />
+<col width="30%" />
+<col width="10%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">Overall_Index</th>
+<th align="center">Total_Equal_Weight_Pr</th>
+<th align="center">FX</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>Information Ratio: Total Equal Weight Pr</strong></td>
+<td align="center">0.2748</td>
+<td align="center">NA</td>
+<td align="center">-1.088</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>Information Ratio: Overall Index</strong></td>
+<td align="center">NA</td>
+<td align="center">-0.2748</td>
+<td align="center">-1.066</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>Information Ratio: Top 30 Index</strong></td>
+<td align="center">-4.311</td>
+<td align="center">-2.274</td>
+<td align="center">-2.18</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>Information Ratio: Top 50 Index</strong></td>
+<td align="center">-1.082</td>
+<td align="center">-0.5091</td>
+<td align="center">-1.148</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>Information Ratio: Free Float Index</strong></td>
+<td align="center">-2.083</td>
+<td align="center">-1.395</td>
+<td align="center">-1.509</td>
+</tr>
+</tbody>
+</table>
+
+<table style="width:69%;">
+<colgroup>
+<col width="43%" />
+<col width="12%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">Equity</th>
+<th align="center">Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>Information Ratio: Total Equal Weight Pr</strong></td>
+<td align="center">3.414</td>
+<td align="center">1.19</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>Information Ratio: Overall Index</strong></td>
+<td align="center">3.218</td>
+<td align="center">0.7444</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>Information Ratio: Top 30 Index</strong></td>
+<td align="center">0.9096</td>
+<td align="center">-1.284</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>Information Ratio: Top 50 Index</strong></td>
+<td align="center">2.717</td>
+<td align="center">0.3785</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>Information Ratio: Free Float Index</strong></td>
+<td align="center">2.515</td>
+<td align="center">0.003827</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Based on last year conclusion I stopped looking at just annualized Sharp
+ratio and be happy when it is above two. Standard deviation, Information
+ratio and Sharp ratio when considered together and calculated by using
+rolling time windows seem to result better measure of performance at
+each point. I think that this is still not an optimal performance
+measure at each point and I feel that it needs to be enhanced.</p>
+
+<p>Another fact that I learned is the importance of increasing assets under
+management. I have done it and quantified results showed me that it is
+not in any way less important than other factors like timing, analysis,
+prospect of assets, risk management, performance analysis, frequency of
+trading, leverage and network.</p>
+
+<p>Having my GRE and IELTS results, it is probable that I will study
+Corporate Finance MSc in coming academic year. If Covid-19 situation
+makes this improbable, then a company will be born :)</p>
+
+<h6 id="please-inform-me-about-your-feedback-i-will-be-deeply-grateful-for-that-"><em>Please inform me about your feedback, I will be deeply grateful for that :)</em></h6>
+
+<h6 id="for-disclaimer-please-see-about-page">For disclaimer please see about page.</h6>
+:ET

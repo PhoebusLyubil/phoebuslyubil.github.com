@@ -1,0 +1,279 @@
+I"G,<h2 id="benchmark-part-iii">Benchmark Part III</h2>
+
+<p>Lets build mean variance portfolio and compare its out-of-sample
+forecasting power to VLGI. Since lots of discontinuities exist in the
+data and since the number of stocks grows over time I would use a
+variable basis, exactly like VLGI, that uses 3/4 of the most traded
+stocks during six month period preceding to the data.</p>
+
+<p>For computing minimum variance portfolio, since there is no possibility
+to short stocks in Tehran Stock Exchange, I would use the criteria that
+no short is allowed. No leverage is another criteria that I would
+consider.</p>
+
+<h3 id="data">Data</h3>
+
+<p>I would use the same structure for data as before. For making matrix
+algebra easier I will change the shape of data.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>source("C:/Users/msdeb/Documents/Stock and trades/functions.R")
+
+retDATAw&lt;- reshape( WDATA[, c( "DATE", "sym", "retCL_t")],
+                   timevar = "DATE", idvar = "sym", direction = "wide")
+retDATAw &lt;- t( retDATAw)
+colnames( retDATAw) &lt;- retDATAw[1,]
+retDATAw &lt;- retDATAw[-1,]
+J&lt;- rownames( retDATAw)
+J&lt;- matrix( unlist( strsplit(J, split = "[.]")), ncol=  2,byrow = T)[, 2]
+retDATAw&lt;- apply( retDATAw, 2, function( x) as.numeric( x))
+retDATAw&lt;- as.data.frame( retDATAw)
+retDATAw$DATE&lt;- as.Date( J)
+</code></pre></div></div>
+
+<h3 id="quadratic-programming">Quadratic Programming</h3>
+
+<p>For solving the quadratic optimization problem subject to our
+constraints I use solve.QP from “quadprog” package. Since data has lots
+of NAs there is a high probability that the resulting covariance
+function is <strong>not</strong> positive definite. In order to solve this problem I
+considered two solutions, first one is to use nearest positive definite
+matrix of covariance matrix. the second one is to use global
+Optimization by Differential Evolution. Former was computed by
+make.positive.definite function from “corocor” package, and second by
+“DEoptim” package.</p>
+
+<p>Results with nearest positive definite matrix have less variance in the
+sample I used, and computing them are much less computationally
+expensive than DEoptim. So here I would write the results about the
+former. <em>(I’m not perfectly familiar with parameter tuning of DEoptim,
+so maybe better results are available. For current mean variance
+optimization I think that nearest positive definite matrix will suffice,
+please tell me if you happen to know any other method and you think its
+more suitable, in advance thank you :) )</em></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>MV.ret&lt;- function(data = train, 
+                  date_data. = date_data, NA_last_obs. = NA_last_obs,
+         short = FALSE, min.mu = 0.001, ret.min = FALSE){
+  date.beg&lt;- as.Date( data$DATE[1])
+ ith.break.date&lt;- sum( date.beg &gt;= date_data.) 
+ sub_index_data&lt;- data[, ( colnames( data) %in% as.factor( portion.sym[[ ith.break.date]]))]
+ sub_index_data&lt;- droplevels( sub_index_data)
+ win_length&lt;- dim( sub_index_data)[ 1]
+ sum.na.col&lt;- apply( sub_index_data, 2, function(x) sum( is.na(x)))
+ sub_index_data&lt;- sub_index_data[, which( sum.na.col&lt; (9*10))]
+ 
+ mu.hat &lt;- colMeans(sub_index_data, na.rm = TRUE)
+ 
+ sigma2.hat &lt;- cov( sub_index_data, use = "pairwise.complete.obs")
+ m.sigma2.hat&lt;- mean( sigma2.hat, na.rm = TRUE)
+ sigma2.hat &lt;- apply( sigma2.hat, 2, function(x) { x[( 
+   is.na( x))]&lt;- m.sigma2.hat ; x})
+ D.mat = 2 * sigma2.hat
+ meq. = 1
+ A.mat = cbind( rep( 1, dim( sigma2.hat)[ 1]),
+                diag(dim(sigma2.hat)[1]))
+ 
+ if( ret.min == TRUE &amp; max( mu.hat) &lt; min.mu ) {
+   min.mu &lt;- mean( mu.hat)
+   print( " unattainable min.mu changed to avrerage mu.hat ")
+ }
+ 
+ if( short == TRUE &amp; ret.min == FALSE) A.mat&lt;- cbind(rep(1,dim(sigma2.hat)[1]))
+
+ b.vec = c(1 , rep(0, dim( sigma2.hat)[1]))
+ 
+ if( ret.min == TRUE &amp; short == FALSE) {
+   A.mat = cbind( mu.hat, rep( 1,dim( sigma2.hat)[1]),
+                  diag(dim(sigma2.hat)[1]))
+   b.vec = c( min.mu, 1 , rep( 0, dim( sigma2.hat)[1]))
+   meq. = 2
+ }
+ 
+ if( ret.min == TRUE &amp; short == TRUE) {  
+   A.mat = cbind( mu.hat, rep( 1,dim( sigma2.hat)[1])) 
+   b.vec = c( min.mu, 1)
+ }
+ 
+ sigma2.hat.PD&lt;- make.positive.definite( sigma2.hat)
+ D.mat = 2*sigma2.hat.PD
+ 
+ qp.out = solve.QP( Dmat  =  D.mat,
+                    dvec = rep(0, dim(sigma2.hat.PD)[1]),
+                    Amat=A.mat, bvec=b.vec, meq= meq.)
+ 
+ 
+ weig&lt;- qp.out$solution
+ weig[ abs( weig) &lt; 1e-4]&lt;- 0
+ weig&lt;- weig / sum( weig)
+ 
+
+ retDATAw_last&lt;- apply( sub_index_data, 2, NA_last_obs. )
+ 
+ mu.p = crossprod (weig,mu.hat)
+ sigma2.p= t( weig) %*%  sigma2.hat %*% weig
+ ret.porfolio&lt;- ( 1+ retDATAw_last[ dim (retDATAw_last)[1], ]) %*% weig
+ out&lt;- cbind ( mu.p = mu.p, sigma2.p = sigma2.p, ret.porfolio = ret.porfolio )
+ colnames( out)&lt;- c( "mu.p", "sigma2.p", "ret.portfolio")
+ weig&lt;- rbind( weig)
+ colnames( weig) = colnames( sub_index_data)
+ out&lt;- cbind( out, weig)
+ out&lt;- cbind( out, date.beg)
+ return(out)
+}
+</code></pre></div></div>
+
+<p>solve.QP occasionally produces NaN, and I have not found any reasons for
+that ( replicating computations sometimes results in non NaN results), I
+use previous weights for computing the portfolio return in these cases.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>MV.ret.prv&lt;- function(d ata = train, 
+                  date_data. = date_data, NA_last_obs. = NA_last_obs,
+                  weig = w.prv, date.beg = date.prv){
+  ith.break.date&lt;- sum( date.beg &gt;= date_data.) 
+  sub_index_data&lt;- data[, ( colnames(data) %in% as.factor( portion.sym[[ ith.break.date]]))]
+  sub_index_data&lt;- droplevels( sub_index_data)
+  win_length&lt;- dim( sub_index_data)[1]
+  sum.na.col&lt;- apply( sub_index_data, 2, function(x) sum( is.na( x)))
+  sub_index_data&lt;- sub_index_data[, which( sum.na.col&lt; ( 9*10))]
+  weig&lt;- weig[ ( names( weig) %in% colnames( sub_index_data))]
+  
+  sigma2.hat &lt;- cov( sub_index_data, use = "pairwise.complete.obs")
+  m.sigma2.hat&lt;- mean( sigma2.hat, na.rm = TRUE)
+  sigma2.hat &lt;- apply( sigma2.hat, 2, function(x) {x[( is.na( x))]&lt;- m.sigma2.hat ; x})
+  
+  mu.hat &lt;- colMeans( sub_index_data, na.rm = TRUE)
+  weig[ abs( weig) &lt; 1e-4]&lt;- 0
+  weig&lt;- weig / sum( weig)
+
+  retDATAw_last&lt;- apply( sub_index_data, 2, NA_last_obs. )
+  
+  mu.p = crossprod  (weig, mu.hat)
+  sigma2.p= t( weig) %*%  sigma2.hat %*% weig
+  ret.porfolio&lt;- ( 1+ retDATAw_last[ dim ( retDATAw_last)[1], ]) %*% weig
+  out&lt;- cbind ( mu.p = mu.p, sigma2.p = sigma2.p, ret.porfolio = ret.porfolio )
+  colnames(out)&lt;- c( "mu.p", "sigma2.p", "ret.portfolio")
+  weig&lt;- rbind( weig)
+  colnames(weig) = colnames( sub_index_data)
+  out&lt;- cbind( out, weig)
+  out&lt;- cbind( out, date.beg)
+  return(out)
+}
+
+
+win=120
+n = dim( retDATAw)[1] - win + 1
+fcmat = NULL
+fit = NULL
+  for(i in 130 : n)   {  
+    train &lt;- retDATAw[ i:( i + win -1 ),]
+    fit &lt;- MV.ret( train, date_data. = date_data, NA_last_obs. = NA_last_obs,
+                  short = FALSE, min.mu = 0.001, ret.min = FALSE)
+    if( is.nan( fit[1,1]) != TRUE) {
+      w.prv = fit[, 4 : ( length(fit) - 1)]
+      date.prv = fit[ , length(fit)]
+    }
+    if( is.nan( fit[1,1])) {
+      fit &lt;- MV.ret.prv( data = train, date_data. = date_data,
+                         NA_last_obs. = NA_last_obs,
+                         weig = w.prv, date.beg = date.prv)
+    }
+      fit&lt;- ( fit[,1:3])
+      names.fit&lt;- names( fit)
+      fit&lt;- rbind.data.frame( fit)
+      colnames( fit)&lt;- names.fit
+      fit$DATE &lt;- retDATAw[ (i + win -1) ,]$DATE
+      fcmat&lt;- rbind( fcmat, fit)
+  }
+</code></pre></div></div>
+
+<p>This is how cumulative product of returns looks like:</p>
+
+<p><img src="../img/cumprodMV.png" alt="" /></p>
+
+<p>It seems to me that the results are pretty much inferior to <a href="https://www.quandl.com/data/ODA/IRN_NGDP_D-Islamic-Republic-of-Iran-GDP-Deflator">Iran’s GDP
+deflator</a>.
+That is to say even inflation is not covered under this portfolio, who
+dares to talk about idiosyncratic risk! Anyway, my objective was to
+compare its predictory power so lets see that.Like before I would use
+<em>r</em><sub><em>i</em>, <em>t</em></sub> = <em>α</em> + <em>β</em><sub>1</sub><em>r</em><sub><em>i</em>, <em>t</em> − 1</sub> + <em>β</em><sub>2</sub><em>r</em><sub><em>m</em>, <em>t</em> − 1</sub> + <em>e</em>
+for getting errors.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>th= floor((Sys.Date() - as.Date("2014-03-21"))*240/365)
+h&lt;-1
+Order&lt;-c(1,0,0)
+dimmodel&lt;-3
+win=120
+model="pARp"
+regressed="retCL_t"
+reg.type = "prd"
+MAR_MOD.="ret.portfolio"
+fcmat$ret.portfolio&lt;- fcmat$ret.portfolio -1
+######
+
+WDATA.&lt;- subset(WDATA, WDATA$DATE &gt;= fcmat$DATE[1])
+cl = createCluster(12, export = list("Arima.prd.IND",
+                                     "reg.type",
+                                     "h","Order","fcmat",
+                                     "win", "th", "h","MAR_MOD.",
+                                     "model","dimmodel","regressed"
+),
+lib = list("forecast", "dplyr"))
+
+
+pARp.DIND.var&lt;-ddply(.data = WDATA., .(sym), .progress= "tk",
+                     .parallel = TRUE,
+                     .fun =function(x) Arima.prd.IND(xsym = x,
+                                                     MAR_MOD=MAR_MOD.,
+                                                     KK=fcmat,
+                                                     h=1,win=120, th=th, Order=c(1,0,0), model="pARp",
+                                                     dimmodel=3, regressed="retCL_t",reg.type = "prd"
+                     ))
+
+
+stopCluster(cl)
+</code></pre></div></div>
+
+<h2 id="results">Results</h2>
+
+<p>Out-of-sample 1 period ahead RMSE of VLGI is lower than mean variance
+method.</p>
+
+<table style="width:29%;">
+<colgroup>
+<col width="13%" />
+<col width="15%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">RMSE MV</th>
+<th align="center">RMSE VLGI</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">0.02374</td>
+<td align="center">0.02308</td>
+</tr>
+</tbody>
+</table>
+
+<p>Lets see how rolling mean of the errors behave. Since square root is a
+concave function and I want to take mean for all the sample for each
+day, I would use Mean Absolute Error, MAE, instead. otherwise taking two
+mean and a square root between them would not result what we want due to
+Jensen inequality.</p>
+
+<p><img src="../img/MAE MV VLGI.png" alt="" /></p>
+
+<p>Plot shows that MV predict worse when errors increasing. Yet at the
+right part it produce slightly better result than VLGI.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Having all methods, hereafter I think using VLGI as a predictory
+variable seems better than others. So I would use that as my benchmark.</p>
+
+<h6 id="please-inform-me-about-your-feedback-i-will-be-deeply-grateful-for-that-"><em>Please inform me about your feedback, I will be deeply grateful for that :)</em></h6>
+
+<h6 id="for-disclaimer-please-see-about-page">For disclaimer please see about page.</h6>
+:ET

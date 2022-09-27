@@ -1,0 +1,1605 @@
+I"��<h3 id="imaginary-world">Imaginary World</h3>
+
+<p>Why an imaginary world? the short answer is, because I studied economics
+and there I learnt to make assumptions whenever and wherever I desired
+:)). The long answer is that when I was backpacking through trans
+Siberia, I thought that in Tehran Stocks Exchange, short selling is not
+possible, as a result spread trading could not be exploited and hence
+spreads are high and mean revertible. Simply, if there is no
+competition, anomaly would preserve. So I thought if this is true, maybe
+one can detect with a plausible probability that which one of the pairs
+is undervalued, for example by utilizing a third or more series. And
+this could result in implementing nice strategies. Here I will see
+whether this assumption would result favorable results. Since it is an
+imaginary world I would use just simple methods. if it gonna work by
+using a third series, it need to be profitable in simple forms. For this
+purpose I tried to use QuantStrat package. Up until using it, I normally
+used functions written by myself for strategy implementation purposes. I
+used it, and it turned out to not be good idea, it was both slow and the
+code used different style than the packages I used. For example it used
+“match.names” function that used partial match names and it forced me to
+change all of my object naming method. Or some functions need to be
+modified to consider irregular dates format and NAs. I think that if I
+have had migrated to Julia for this matter it would have been better.</p>
+
+<h3 id="simple-pair-candidates">simple pair candidates</h3>
+
+<p>Pairs are selected based on correlations and not by common factor
+models. And the results where tested by Phillips Ouliaris test for
+cointegration. In of sample period from “2010-01-01” to “2015-01-01” has
+been used for computing correlations. I used whole sample data also, the results was profitable but I
+have not included them here. I mean, If I had the whole sample data, life
+would have not been a martingale :). The results are somehow strange and
+some pairs seems not to be related at all. Further, stocks are reduced
+to ones that have on average at least 5*10^5 volume per day. By my
+experience having this amount of volume, slippage could be neglected
+while trading 10^8 Rials value of stocks (it would be on average around
+2-5 Rials per round trip trade on a normal day by my experience, a
+detailed an accurate quantity needs to be computed by tick data. In
+cases like the ones I explained in Markov Chain post, it would be
+substantially more. Here I have not seen that it is necessary to include
+such details). another reason is that I saw that less liquid assets have
+some lag before adjusting to news.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>colnames(WDATA)&lt;- c("DATE","sym","FIRST", "HIGH", "LOW", "LCLOSE",
+                    "VOL", "CLOSE" )
+
+vol.sym.mean&lt;- ddply(WDATA, "sym", .fun = function(x) {
+  denom&lt;- as.numeric(x$DATE[dim(x)[1]] - x$DATE[1])
+  denom&lt;- floor(denom*(202/364))
+  mean.vol&lt;- sum(as.numeric(x$VOL), na.rm = TRUE) / denom
+  return(mean.vol)
+  })
+
+sym.min.vol&lt;- droplevels(vol.sym.mean[,1][which(vol.sym.mean[2] &gt; 5*10^5)])
+WDATA&lt;-subset(WDATA, WDATA$sym %in% sym.min.vol)
+WDATA&lt;- droplevels(WDATA)
+
+WDATA_last&lt;- subset(WDATA_last, WDATA_last$DATE &gt;= as.Date("2010-01-01") &amp; WDATA_last$DATE &lt;= as.Date("2015-01-01"))
+
+retDATA&lt;- WDATA_last[,c("DATE","sym","retCL_t")]
+retDATAw&lt;- dcast(retDATA, DATE ~ sym, value.var = "retCL_t")
+J &lt;- (retDATAw[, 1])
+retDATAw &lt;- retDATAw[,-1]
+rownames(retDATAw)&lt;- J
+rm(J)
+retDATAw&lt;- apply(retDATAw,2, function(x) as.numeric(x))
+#scale_retDATAw&lt;- apply(retDATAw,2, scale)
+
+
+abs_cor&lt;- abs(cor(retDATAw, use = "pairwise.complete.obs"))
+diag(abs_cor)&lt;-0
+cor.high.10&lt;- sort(abs_cor, decreasing = TRUE)[1:50]
+
+cor.ranked.sym&lt;- list()
+for( i in seq(2,50, by = 2)){
+  cor.ranked.sym[[( i / 2)]]&lt;-rownames(which(abs_cor == cor.high.10[i], arr.ind = TRUE))
+}
+
+for( i in 1 : length(cor.ranked.sym) ){
+  ret.sym.1&lt;- cor.ranked.sym[[i]][1]
+  ret.sym.2&lt;- cor.ranked.sym[[i]][2]
+  ret.m&lt;- cbind( retDATAw [ ,ret.sym.1 ], 
+                 retDATAw [ ,ret.sym.2])
+  temp&lt;- po.test(ret.m)$p.value
+  print(temp)
+}
+</code></pre></div></div>
+
+<h4 id="transaction-costs">transaction costs</h4>
+
+<p>transaction costs is about 0.005 for buying the stock and 0.01 for
+selling the stocks. It also includes tax on selling stocks that is about
+0.005 of stocks value. And a good point about Tehran Stock Exchange is
+that there is no other tax than this and capital gain tax is zero :)</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>txnFUN &lt;- function(TxnQty, TxnPrice, Symbol, rate = 0.015) {
+  comission &lt;- abs(TxnQty) * TxnPrice * rate
+  if (comission &gt; 0) comission &lt;- -comission
+  return(comission)
+}
+</code></pre></div></div>
+
+<h4 id="computing-spread">Computing Spread</h4>
+
+<p>Total least square, Dynamic OLS, Integrated Modified OLS, and OLS with
+changing the dependent variable is used for getting the betas and
+constructing spread.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>beta.fun&lt;- function( ret.all = ret.m){
+  
+  
+  end_date&lt;- index(ret.all)[ length(ret.all[,1])]
+  
+  po.pvalue&lt;- suppressWarnings( po.test(ret.all)$p.value)
+  
+  pca.ret&lt;- prcomp( ~ as.numeric(ret.all[,1]) + as.numeric( ret.all[,2]))
+  beta.pca&lt;- pca.ret$rotation[2, 1] / pca.ret$rotation[1, 1]
+  spread.pca&lt;- ret.all[,2 ] - beta.pca * ret.all[,1 ]
+  level.pca&lt;- mean (spread.pca, na.rm = TRUE)
+  
+  beta.12&lt;- lm(as.numeric(ret.all[,1])~as.numeric( ret.all[,2]) - 1)$coeff
+  beta.21&lt;- lm(as.numeric(ret.all[,2])~as.numeric( ret.all[,1]) - 1)$coeff
+  spread.12&lt;- ret.all[,1 ] - beta.12 * ret.all[,2 ]
+  level.12&lt;- mean (spread.12, na.rm = TRUE)
+  spread.21&lt;- ret.all[,2 ] - beta.21 * ret.all[,1 ]
+  level.21&lt;- mean (spread.21, na.rm = TRUE)
+  
+  beta.DOLS&lt;- cointRegD(as.numeric( ret.all[,1]), as.numeric( ret.all[,2]))$beta
+  spread.DOLS&lt;- ret.all[,1 ] - beta.DOLS * ret.all[,2 ]
+  level.DOLS&lt;- mean (spread.DOLS, na.rm = TRUE)
+  
+  beta.IMOLS&lt;- cointRegIM(as.numeric( ret.all[,1]), as.numeric( ret.all[,2]))$gamma
+  spread.IMOLS&lt;- ret.all[,1 ] - beta.IMOLS * ret.all[,2 ]
+  level.IMOLS&lt;- mean (spread.IMOLS, na.rm = TRUE)
+  
+  out&lt;- cbind.data.frame(#DATE = end_date,
+    po.pvalue = po.pvalue,
+    beta.pca = beta.pca,
+    spread.pca = spread.pca[length(spread.pca)],
+    level.pca = level.pca,
+    beta.12 = beta.12,
+    spread.12 = spread.12[length(spread.12)],
+    level.12 = level.12,
+    beta.21 = beta.21,
+    spread.21 = spread.21[length(spread.21)],
+    level.21 = level.21,
+    beta.DOLS = beta.DOLS,
+    spread.DOLS = spread.DOLS[length(spread.DOLS)],
+    level.DOLS = level.DOLS,
+    beta.IMOLS = beta.IMOLS,
+    spread.IMOLS = spread.IMOLS[length(spread.IMOLS)],
+    level.IMOLS = level.IMOLS
+    # po.test, if needed for furthure work
+  )
+  out&lt;- as.numeric(out)
+  return(out)
+}
+
+thresold_level&lt;- function(data = data ,level.m = "mlevel_pca", sd.m = "sd_spread_pca", multi = 1) {
+  sym.name&lt;- strsplit(colnames(data)[1], split="[.]")[[1]][1]
+  out&lt;- cbind( data[, level.m] + (multi * data[, sd.m]),
+               data[, level.m] - (multi * data[, sd.m]))
+  method.name&lt;- strsplit(level.m, split="[_]")[[1]][2]
+  names.out&lt;- c( paste("upper", method.name, sep = "_"),
+                 paste("lower", method.name, sep = "_"))
+  colnames(out)&lt;- names.out
+  return(out)
+}
+</code></pre></div></div>
+
+<p>The threshold is computed based on standard deviation of spread.</p>
+
+<h4 id="function-for-placing-orders">Function for placing orders</h4>
+
+<p>This function is a modification to demo function in the package that I
+modified for replacing pairs order, NAs in data and considering end
+equity on trade size. I use level one for trade sizing, tests with level
+two resulted on much better results.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>osSpreadMaxPos &lt;- function (data, timestamp, orderqty, ordertype, orderside, beta.method, lvls,
+                            portfolio.st, account.st,
+                            portfolio, symbol, ruletype, reverse, cor.pair, orderprice, ...) {
+  portf &lt;- getPortfolio(portfolio)
+  #check to make sure pair slot has the things needed for this function
+  
+  x&lt;- get(symbol)$RHS[1]
+  if (x == 1) legside &lt;- "long"
+  if (x == 0) legside &lt;- "short"
+  if (reverse == TRUE &amp; x == 1) legside &lt;- "short"
+  if (reverse == TRUE &amp; x == 0) legside &lt;- "long"
+  
+  updatePortf(portfolio.st)
+  updateAcct( account.st, paste(t.out0, timestamp, sep="::"))
+  updateEndEq( account.st, paste(t.out0, timestamp, sep="::"))
+  endEq&lt;- floor( getEndEq( account.st, Date = timestamp))
+  
+  
+  x1 &lt;- get(cor.pair[1])
+  x2 &lt;- get(cor.pair[2])
+  
+  spread.price &lt;- (1 * Cl(x1)) + (abs(x1[,beta.method]) * Cl(x2))
+  if (reverse == TRUE){
+    spread.price &lt;- (abs(x1[,beta.method]) * Cl(x1)) + ( 1 * Cl(x2))
+  }
+  colnames(spread.price) &lt;- 'spread.price'
+  
+  spread.num&lt;- endEq / spread.price
+  
+  long.size&lt;- (spread.num / (1 + abs(x1[,beta.method]))) / (lvls )
+  short.size&lt;- (long.size * abs(x1[,beta.method])) / (lvls)
+  
+  long.size[ is.na(long.size)]&lt;- 0
+  short.size[ is.na(short.size)]&lt;- 0
+  long.size[ is.null(long.size)]&lt;- 0
+  short.size[ is.null(short.size)]&lt;- 0
+  if( length(x1[as.POSIXct(timestamp)]) != 0 &amp; 
+      length(long.size[as.POSIXct(timestamp)]) != 0 &amp;
+      length(short.size[as.POSIXct(timestamp)]) != 0) {
+  #ratio &lt;- getHedgeRatio(portfolio, timestamp)
+  pos &lt;- getPosQty(portfolio, symbol, timestamp)
+  try(addPosLimit(portfolio=portfolio, timestamp=timestamp, symbol=symbol,
+                  maxpos=round(long.size[as.POSIXct(timestamp)],0), longlevels=lvls,
+                  minpos=round(-long.size[as.POSIXct(timestamp)],0), shortlevels=lvls))
+  qty &lt;- long.size[as.POSIXct(timestamp)] 
+  if (legside == "short") {#symbol is 2nd leg
+    ## Comment out next line to use equal ordersizes for each stock.
+    try(addPosLimit(portfolio=portfolio, timestamp=timestamp, symbol=symbol,
+                    maxpos=round(short.size[as.POSIXct(timestamp)],0), longlevels=lvls,
+                    minpos=round(-short.size[as.POSIXct(timestamp)],0), shortlevels=lvls))
+    ##
+    qty &lt;- -short.size[as.POSIXct(timestamp)]  #switch orderqty for Stock B
+  }
+  
+  if (qty &gt; 0) orderside = 'long'
+  if (qty &lt; 0) orderside = 'short'
+  
+  orderqty &lt;- osMaxPos(data=data,timestamp=timestamp, orderqty=qty,
+                       ordertype=ordertype, orderside=orderside,
+                       portfolio=portfolio, symbol=symbol, ruletype=ruletype,
+                       ...)
+  
+  } else {
+    qty &lt;- 0
+    orderside &lt;- 'long'
+    orderqty &lt;- 0
+  }
+  
+  if (!is.null(orderqty) &amp; !orderqty == 0 &amp; !is.null(orderprice)) {
+    addOrder(portfolio=portfolio, symbol=symbol,
+             timestamp=timestamp, qty=orderqty, price=as.numeric(orderprice),
+             ordertype=ordertype, side=orderside, replace=FALSE,
+             status="open", ...=...)
+  }
+  return(0) 
+}
+</code></pre></div></div>
+
+<h4 id="loop-or-function">Loop or Function</h4>
+
+<p>First I tried to write a function for computing the results but some of
+packages functions failed to work inside functions, I think it was
+because of environment they were defined to create. Instead of making
+changes in global environment with functions, I see that it is more
+reasonable to use for loops. Here I do not write replication for
+different kind of calculated spread and corresponding rules and signals-
+it became too lengthy. Betas, Spread level and sd are computed by 30
+days backward rolling window.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>results&lt;- list()
+temp&lt;- NULL
+for ( i in 6 : length(cor.ranked.sym)){
+
+  cor.pair = cor.ranked.sym [[i]]
+  beta.fun. = beta.fun;
+  osSpreadMaxPos. = osSpreadMaxPos # index = VLGI
+  txnFUN. = txnFUN
+    
+    rm(list = ls(.blotter), envir = .blotter)
+    rm(list = ls(.strategy), envir = .blotter)
+    if (!exists('.blotter')) .blotter &lt;- new.env()
+    if(!exists('.strategy')) .strategy &lt;- new.env()
+    if(!exists('.instrument')) .instrument &lt;- new.env()
+    
+    symbols &lt;- cor.pair
+    stock(symbols, currency = "IRR", multiplier = 1)
+    ret.1&lt;- diff.xts( x = log( get( cor.pair[1 ])[,6 ]))
+    ret.2&lt;- diff( log( get( cor.pair[2 ])[,6 ]))
+    ret.m&lt;- cbind( ret.1, ret.2)
+    ret.m&lt;- ret.m[complete.cases(ret.m[,1]),]
+    ret.m&lt;- ret.m[complete.cases(ret.m[,2]),]
+    ret.m&lt;- ret.m[paste(t.out0,"::", sep = "")]
+    
+    # roll apply
+    
+    betas&lt;- rollapply(ret.m, width = 30,
+                      FUN = function(x) beta.fun.(x), by.column = FALSE, align = "right")
+    sd_spread&lt;- rollapply(betas[,c(3,6,9,12,15)],
+                          width = 30, FUN = function(x) apply(x, 2 , sd, na.rm = TRUE),
+                          by.column = FALSE, align = "right")
+    mean_level&lt;- rollapply(betas[,c(4,7,10,13,16)],
+                           width = 30, FUN = function(x) apply(x, 2 , sd, na.rm = TRUE),
+                           by.column = FALSE, align = "right")
+    betas&lt;- cbind(betas, sd_spread)
+    betas&lt;- cbind( betas, mean_level)
+    
+    names_beta&lt;- c("po_pvalue", "beta_pca", "spread_pca",
+                   "level_pca", "beta_12", "spread_12",
+                   "level_12", "beta_21", "spread_21",
+                   "level_21", "beta_DOLS", "spread_DOLS",
+                   "level_DOLS", "beta_IMOLS", "spread_IMOLS",
+                   "level_IMOLS",
+                   "sdD_pca", "sdD_12", "sdD_21",
+                   "sdD_DOLS", "sdD_IMOLS",
+                   "mlevel_pca", "mlevel_12", "mlevel_21",
+                   "mlevel_DOLS", "mlevel_IMOLS")
+    colnames(betas)&lt;- names_beta
+    
+    #zero crossing
+    zerocross.pca&lt;- length( rle( as.numeric(betas$spread_pca) &gt;=
+                                   as.numeric(betas$mlevel_pca))$lengths) -1
+    zerocross.12&lt;- length( rle( as.numeric(betas$spread_12) &gt;= 
+                                  as.numeric(betas$mlevel_12))$lengths) -1
+    zerocross.21&lt;- length( rle( as.numeric(betas$spread_21) &gt;=
+                                  as.numeric(betas$mlevel_21))$lengths) -1
+    zerocross.DOLS&lt;- length( rle( as.numeric(betas$spread_DOLS) &gt;=
+                                    as.numeric(betas$mlevel_DOLS))$lengths) -1
+    zerocross.IMOLS&lt;- length( rle( as.numeric(betas$spread_IMOLS) &gt;=
+                                     as.numeric(betas$mlevel_IMOLS))$lengths) -1
+    
+    zerocross&lt;- c( zerocross.pca = zerocross.pca, zerocross.12 = zerocross.12,
+                   zerocross.21 = zerocross.21, zerocross.DOLS = zerocross.DOLS,
+                   zerocross.IMOLS = zerocross.IMOLS)
+    
+    
+    sd.pca&lt;- thresold_level( data = betas,
+                             level.m = "mlevel_pca", sd.m = "sdD_pca", multi = 1)
+    betas&lt;- cbind( betas, sd.pca)
+    
+### doing same for other methods
+    
+    
+    temp&lt;- get( cor.pair[1 ])
+    temp&lt;- cbind( temp, betas)
+    temp&lt;- cbind( temp, 1)
+    colnames( temp)[ length( colnames( temp))]&lt;- "RHS"
+    assign( cor.pair[1 ], temp)
+    rm( temp)
+    
+    
+    temp&lt;- get( cor.pair[2 ])
+    temp&lt;- cbind( temp, betas)
+    temp&lt;- cbind( temp, 0)
+    colnames( temp)[ length( colnames( temp))]&lt;- "RHS"
+    assign( cor.pair[2 ], temp)
+    rm( temp)
+    
+    # buy sell signal
+    
+    strategy.pca &lt;- paste("strategy", "pca",  cor.pair[1 ],  cor.pair[2 ], sep = "_")
+    portfolio.pca &lt;- paste("portfolio", "pca",  cor.pair[1 ],  cor.pair[2 ], sep = "_")
+    account.pca&lt;- paste("account", "pca",  cor.pair[1 ],  cor.pair[2 ], sep = "_")
+    rm.strat(portfolio.pca)
+    rm.strat(strategy.pca)
+    rm.strat(account.pca)
+    
+    initPortf( portfolio.pca, symbols = symbols, initDate = initDate, currency = "IRR")
+    initAcct( account.pca, portfolios = portfolio.pca, initDate = initDate, currency = "IRR", initEq = initEq)
+    initOrders(portfolio =  portfolio.pca, initDate = initDate)
+    #test&lt;- tryCatch(getPortfolio(portfolio.pca), error=function(e){NA})
+    strategy(strategy.pca, store = TRUE)
+    
+    # same for other methods
+
+    add.signal(strategy = strategy.pca,  data = quote(mktdata), name = "sigCrossover",
+               arguments = list( columns = c( "spread_pca", "upper_pca"), relationship= "gt"),
+               label = "shortOrsell")
+    
+    add.signal(strategy = strategy.pca, data = quote(mktdata), name = "sigCrossover",
+               arguments = list( columns = c( "spread_pca", "lower_pca"), relationship= "lt"),
+               label = "buyOrcover")
+    
+    # same for other methods
+    #### pca
+    
+    add.rule(strategy=strategy.pca, name='ruleSignal',
+             arguments=list(sigcol="shortOrsell", sigval=TRUE,
+                            orderqty=1e7, ordertype='market', cor.pair = cor.pair,
+                            orderside=NULL, osFUN='osSpreadMaxPos.',  reverse = FALSE,
+                            replace = FALSE,  beta.method = "beta_pca",lvls = 1,
+                            portfolio.st = portfolio.pca,
+                            account.st = account.pca,
+                            TxnFees = "txnFUN.", rate = 0.01,
+                            prefer = "Open"),
+             type='enter')
+    add.rule(strategy=strategy.pca, name='ruleSignal',
+             arguments=list(sigcol="buyOrcover", sigval=TRUE,
+                            orderqty=-1e7, ordertype='market', cor.pair= cor.pair,
+                            orderside=NULL, osFUN='osSpreadMaxPos.', reverse = FALSE,
+                            replace = FALSE,  beta.method = "beta_pca",lvls = 1,
+                            portfolio.st = portfolio.pca,
+                            account.st = account.pca,
+                            TxnFees = "txnFUN.", rate = 0.005,
+                            prefer = "Open"),
+             type='enter')
+    add.rule(strategy=strategy.pca, name='ruleSignal',
+             arguments=list(sigcol="buyOrcover", sigval=TRUE,
+                            orderqty='all', ordertype='market',
+                            orderside=NULL, 
+                            replace = FALSE,
+                            TxnFees = "txnFUN.", rate = 0.005,
+                            prefer = "Open"),
+             type='exit')
+    add.rule(strategy=strategy.pca, name='ruleSignal',
+             arguments=list(sigcol="shortOrsell", sigval=TRUE,
+                            orderqty='all', ordertype='market',
+                            orderside=NULL, 
+                            replace = FALSE,
+                            TxnFees = "txnFUN.", rate = 0.01,
+                            prefer = "Open"),
+             type='exit')
+    
+    # same for other methods
+    
+    ######
+    
+    ###############
+    applyStrategy(strategy.pca, portfolio.pca, debug = TRUE)
+    updatePortf(portfolio.pca)
+    updateAcct( account.pca,paste(t.out0, t.out1, sep="::"))
+    updateEndEq(account.pca, paste(t.out0, t.out1, sep="::"))
+    
+    # same for other methods
+    
+    ###########
+    
+    ret1 &lt;- PortfReturns(account.pca,
+                         Dates = paste(t.out0, t.out1, sep="::"))[paste(t.out0, t.out1, sep="::")]
+    PortRets.pca &lt;- xts(rowSums(ret1) , order.by = index(ret1))
+    
+    # same for other methods
+    
+    mDraw.pca&lt;- maxDrawdown( PortRets.pca)
+    an.ret.pca&lt;- as.numeric( Return.annualized( PortRets.pca, geometric = TRUE))
+    an.sharp.pca&lt;- as.numeric( SharpeRatio.annualized(PortRets.pca))
+    UPR.pca&lt;- as.numeric( UpsidePotentialRatio( PortRets.pca)) 
+    #InformationRatio(Ra, VLGI, scale = NA)
+    #UpDownRatios
+    
+    # same for other methods
+    
+    out&lt;- list( ret = list( PortRets.pca = PortRets.pca,
+                            PortRets.12 = PortRets.12,
+                            PortRets.21 = PortRets.21,
+                            PortRets.DOLS = PortRets.DOLS,
+                            PortRets.IMOLS = PortRets.IMOLS),
+                zerocross = zerocross,
+                mDraw = c( mDraw.pca, mDraw.12,
+                           mDraw.21, mDraw.DOLS,
+                           mDraw.IMOLS),
+                an.ret = c( an.ret.pca, an.ret.12,
+                            an.ret.21, an.ret.DOLS,
+                            an.ret.IMOLS),
+                an.sharp = c( an.sharp.pca, an.sharp.12,
+                              an.sharp.21, an.sharp.DOLS,
+                              an.sharp.IMOLS),
+                UPR = c( UPR.pca, UPR.12,
+                         UPR.21, UPR.DOLS,
+                         UPR.IMOLS))
+  results[[i]]&lt;- out
+ print(i)
+}
+</code></pre></div></div>
+
+<h3 id="results">Results</h3>
+
+<p>for comparing strategies I usually use annualized returns, max drawdown
+and Sharp ratio. The first one tells me whether it is better than GDP
+deflator and VLGI, the second tells me whether I can take the pain, and
+third one compares it with risk defined as variance. Usually other
+measures for risk adjusted returns are used, but before I was thinking
+that if stop losses are not existed in strategy, then if we take out the
+drift term, whatever could happen upward could happen downward also. I
+mean, one cannot simply neglect upward movements of a martingale, just
+because it is plausible for them or compare a Brownian motion with
+another and their comovement, and consider it highly informative; the
+information has already been shown through correlation and Beta, plus
+drift. After I read
+<a href="http://www.menet.umn.edu/~zhangs/Reports/2011_CHL2.pdf">this</a> I just
+dropped the assumption that absence of stop loss is necessary, since it
+says that it is the case even for truncated elliptical distributions.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>path = "C:/Users/msdeb/Documents/Stock and trades/"
+setwd(path)
+load(".Rdata")
+library(pander)
+
+an.ret&lt;- NULL
+temp&lt;- NULL
+an.sharp&lt;- NULL
+mDraw&lt;- NULL
+UPR&lt;- NULL 
+zerocross&lt;- NULL
+
+for ( i in 1 : length( results)){
+  temp &lt;- results[[i]]$an.ret
+  an.ret &lt;- rbind( an.ret, temp)
+  temp &lt;- results[[i]]$an.sharp
+  an.sharp &lt;- rbind( an.sharp, temp)
+  temp &lt;- results[[i]]$mDraw
+  mDraw &lt;- rbind( mDraw, temp)
+  temp &lt;- results[[i]]$UPR
+  UPR &lt;- rbind( UPR, temp)
+  temp &lt;- results[[i]]$zerocross
+  zerocross &lt;- rbind( zerocross, temp)
+  
+  name&lt;- paste(cor.ranked.sym [[i]][1 ],  cor.ranked.sym [[i]][2 ], sep = "_")
+  rownames(an.ret)[i]&lt;- name
+  rownames(an.sharp)[i]&lt;- name
+  rownames(mDraw)[i]&lt;- name
+  rownames(UPR)[i]&lt;- name
+  rownames(zerocross)[i]&lt;- name
+}
+name&lt;- c( "pca", "12", "21", "DOLS", "IMOLS")
+  colnames(an.ret)&lt;- name
+  colnames(an.sharp)&lt;- name
+  colnames(mDraw)&lt;- name
+  colnames(UPR)&lt;- name
+  colnames(zerocross)&lt;- name
+
+pander(an.ret)
+</code></pre></div></div>
+
+<table style="width:85%;">
+<colgroup>
+<col width="22%" />
+<col width="12%" />
+<col width="12%" />
+<col width="12%" />
+<col width="12%" />
+<col width="12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">pca</th>
+<th align="center">12</th>
+<th align="center">21</th>
+<th align="center">DOLS</th>
+<th align="center">IMOLS</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>MSKN_DADE</strong></td>
+<td align="center">-0.1191</td>
+<td align="center">-0.1576</td>
+<td align="center">-0.0954</td>
+<td align="center">-0.1847</td>
+<td align="center">-0.175</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>PETR_KAVR</strong></td>
+<td align="center">-0.03679</td>
+<td align="center">-0.132</td>
+<td align="center">-0.2176</td>
+<td align="center">-0.136</td>
+<td align="center">-0.08305</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>SPDZ_SAHD</strong></td>
+<td align="center">-0.2066</td>
+<td align="center">-0.1332</td>
+<td align="center">-0.1305</td>
+<td align="center">-0.1787</td>
+<td align="center">-0.1033</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>TOKA_SPDZ</strong></td>
+<td align="center">-0.0907</td>
+<td align="center">-0.1271</td>
+<td align="center">-0.1402</td>
+<td align="center">-0.1833</td>
+<td align="center">-0.1811</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>TOKA_SAHD</strong></td>
+<td align="center">-0.1233</td>
+<td align="center">-0.1074</td>
+<td align="center">-0.1647</td>
+<td align="center">-0.1271</td>
+<td align="center">-0.1415</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>TRIR_DADE</strong></td>
+<td align="center">-0.1022</td>
+<td align="center">-0.09237</td>
+<td align="center">-0.06199</td>
+<td align="center">-0.1722</td>
+<td align="center">-0.1815</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>SPDZ_MADN</strong></td>
+<td align="center">-0.1492</td>
+<td align="center">-0.1821</td>
+<td align="center">-0.1497</td>
+<td align="center">-0.2017</td>
+<td align="center">-0.09106</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>CHML_BMDZ</strong></td>
+<td align="center">-0.02405</td>
+<td align="center">-0.02676</td>
+<td align="center">-0.1791</td>
+<td align="center">-0.105</td>
+<td align="center">-0.05954</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>SAHD_PLKK</strong></td>
+<td align="center">-0.1315</td>
+<td align="center">-0.1382</td>
+<td align="center">-0.1497</td>
+<td align="center">-0.1236</td>
+<td align="center">-0.104</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>TRIR_MSKN</strong></td>
+<td align="center">-0.03885</td>
+<td align="center">-0.1406</td>
+<td align="center">-0.1162</td>
+<td align="center">-0.1159</td>
+<td align="center">-0.2215</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>KRAF_BHKZ</strong></td>
+<td align="center">-0.01496</td>
+<td align="center">0.01845</td>
+<td align="center">-0.2321</td>
+<td align="center">-0.1935</td>
+<td align="center">-0.09654</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>SPDZ_BIME</strong></td>
+<td align="center">-0.1993</td>
+<td align="center">-0.1532</td>
+<td align="center">0.01241</td>
+<td align="center">-0.2255</td>
+<td align="center">-0.1326</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>TOKA_PLKK</strong></td>
+<td align="center">-0.1344</td>
+<td align="center">-0.1602</td>
+<td align="center">-0.1382</td>
+<td align="center">-0.157</td>
+<td align="center">-0.1386</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>CHML_BSTE</strong></td>
+<td align="center">-0.04435</td>
+<td align="center">-0.03258</td>
+<td align="center">-0.1499</td>
+<td align="center">-0.1137</td>
+<td align="center">-0.1293</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>SPDZ_PLKK</strong></td>
+<td align="center">-0.1933</td>
+<td align="center">-0.1769</td>
+<td align="center">-0.1514</td>
+<td align="center">-0.1932</td>
+<td align="center">-0.1228</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>TRIR_BHKZ</strong></td>
+<td align="center">-0.0053</td>
+<td align="center">-0.1206</td>
+<td align="center">-0.197</td>
+<td align="center">0.0105</td>
+<td align="center">-0.03681</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>TOKA_MADN</strong></td>
+<td align="center">-0.03911</td>
+<td align="center">-0.1897</td>
+<td align="center">-0.107</td>
+<td align="center">-0.1403</td>
+<td align="center">-0.126</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>SSHR_AZIN</strong></td>
+<td align="center">-0.05137</td>
+<td align="center">-0.2715</td>
+<td align="center">-0.1157</td>
+<td align="center">-0.1752</td>
+<td align="center">-0.196</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>SPDZ_BANK</strong></td>
+<td align="center">-0.2575</td>
+<td align="center">-0.1372</td>
+<td align="center">-0.09012</td>
+<td align="center">-0.2419</td>
+<td align="center">-0.2177</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>SPDZ_COMB</strong></td>
+<td align="center">-0.1907</td>
+<td align="center">-0.03624</td>
+<td align="center">-0.1892</td>
+<td align="center">-0.1657</td>
+<td align="center">-0.1745</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>HPKP_BHKZ</strong></td>
+<td align="center">-0.0542</td>
+<td align="center">-0.1469</td>
+<td align="center">-0.2615</td>
+<td align="center">-0.1798</td>
+<td align="center">-0.1569</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>TORZ_BGHZ</strong></td>
+<td align="center">-0.1574</td>
+<td align="center">-0.09773</td>
+<td align="center">-0.2016</td>
+<td align="center">-0.1101</td>
+<td align="center">-0.1561</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>TRIR_KRAF</strong></td>
+<td align="center">-0.06131</td>
+<td align="center">-0.2012</td>
+<td align="center">-0.06416</td>
+<td align="center">-0.1071</td>
+<td align="center">-0.1113</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>MSKN_BHKZ</strong></td>
+<td align="center">-0.03129</td>
+<td align="center">-0.05945</td>
+<td align="center">-0.2585</td>
+<td align="center">-0.06324</td>
+<td align="center">-0.09587</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>TOKA_COMB</strong></td>
+<td align="center">-0.1278</td>
+<td align="center">-0.1374</td>
+<td align="center">-0.2291</td>
+<td align="center">-0.06743</td>
+<td align="center">-0.1591</td>
+</tr>
+</tbody>
+</table>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pander(colMeans(an.ret))
+</code></pre></div></div>
+
+<table style="width:56%;">
+<colgroup>
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">pca</th>
+<th align="center">12</th>
+<th align="center">21</th>
+<th align="center">DOLS</th>
+<th align="center">IMOLS</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">-0.1034</td>
+<td align="center">-0.1256</td>
+<td align="center">-0.1511</td>
+<td align="center">-0.1461</td>
+<td align="center">-0.1357</td>
+</tr>
+</tbody>
+</table>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pander(an.sharp)
+</code></pre></div></div>
+
+<table style="width:79%;">
+<colgroup>
+<col width="22%" />
+<col width="12%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">pca</th>
+<th align="center">12</th>
+<th align="center">21</th>
+<th align="center">DOLS</th>
+<th align="center">IMOLS</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>MSKN_DADE</strong></td>
+<td align="center">-1.493</td>
+<td align="center">-2.378</td>
+<td align="center">-0.4827</td>
+<td align="center">-2.623</td>
+<td align="center">-2.483</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>PETR_KAVR</strong></td>
+<td align="center">-0.5154</td>
+<td align="center">-0.8825</td>
+<td align="center">-1.779</td>
+<td align="center">-0.9855</td>
+<td align="center">-0.7885</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>SPDZ_SAHD</strong></td>
+<td align="center">-2.074</td>
+<td align="center">-1.124</td>
+<td align="center">-1.04</td>
+<td align="center">-1.16</td>
+<td align="center">-0.5504</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>TOKA_SPDZ</strong></td>
+<td align="center">-1.468</td>
+<td align="center">-0.4212</td>
+<td align="center">-1.675</td>
+<td align="center">-0.8586</td>
+<td align="center">-1.018</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>TOKA_SAHD</strong></td>
+<td align="center">-2.399</td>
+<td align="center">-0.7916</td>
+<td align="center">-1.576</td>
+<td align="center">-1.16</td>
+<td align="center">-1.245</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>TRIR_DADE</strong></td>
+<td align="center">-0.8033</td>
+<td align="center">-0.8603</td>
+<td align="center">-0.3515</td>
+<td align="center">-1.137</td>
+<td align="center">-1.746</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>SPDZ_MADN</strong></td>
+<td align="center">-1.235</td>
+<td align="center">-1.505</td>
+<td align="center">-1.154</td>
+<td align="center">-1.254</td>
+<td align="center">-0.4263</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>CHML_BMDZ</strong></td>
+<td align="center">-0.5748</td>
+<td align="center">-0.1282</td>
+<td align="center">-1.4</td>
+<td align="center">-0.6869</td>
+<td align="center">-0.5226</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>SAHD_PLKK</strong></td>
+<td align="center">-2.337</td>
+<td align="center">-2.007</td>
+<td align="center">-0.65</td>
+<td align="center">-2.506</td>
+<td align="center">-2.542</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>TRIR_MSKN</strong></td>
+<td align="center">-0.297</td>
+<td align="center">-1.146</td>
+<td align="center">-0.9144</td>
+<td align="center">-0.6997</td>
+<td align="center">-2.294</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>KRAF_BHKZ</strong></td>
+<td align="center">-0.6621</td>
+<td align="center">0.08135</td>
+<td align="center">-2.243</td>
+<td align="center">-1.457</td>
+<td align="center">-1.028</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>SPDZ_BIME</strong></td>
+<td align="center">-1.808</td>
+<td align="center">-1.329</td>
+<td align="center">0.06908</td>
+<td align="center">-1.677</td>
+<td align="center">-0.7211</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>TOKA_PLKK</strong></td>
+<td align="center">-2.451</td>
+<td align="center">-1.272</td>
+<td align="center">-1.108</td>
+<td align="center">-1.279</td>
+<td align="center">-1.156</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>CHML_BSTE</strong></td>
+<td align="center">-0.9839</td>
+<td align="center">-0.16</td>
+<td align="center">-0.9741</td>
+<td align="center">-0.9615</td>
+<td align="center">-1.804</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>SPDZ_PLKK</strong></td>
+<td align="center">-1.772</td>
+<td align="center">-1.493</td>
+<td align="center">-1.118</td>
+<td align="center">-1.376</td>
+<td align="center">-0.6714</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>TRIR_BHKZ</strong></td>
+<td align="center">-0.03859</td>
+<td align="center">-0.9577</td>
+<td align="center">-2.046</td>
+<td align="center">0.05516</td>
+<td align="center">-0.3142</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>TOKA_MADN</strong></td>
+<td align="center">-0.6652</td>
+<td align="center">-1.449</td>
+<td align="center">-0.9134</td>
+<td align="center">-1.182</td>
+<td align="center">-1.082</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>SSHR_AZIN</strong></td>
+<td align="center">-1.074</td>
+<td align="center">-1.6</td>
+<td align="center">-0.3651</td>
+<td align="center">-1.088</td>
+<td align="center">-1.265</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>SPDZ_BANK</strong></td>
+<td align="center">-2.784</td>
+<td align="center">-1.095</td>
+<td align="center">-0.8336</td>
+<td align="center">-2.157</td>
+<td align="center">-1.156</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>SPDZ_COMB</strong></td>
+<td align="center">-1.751</td>
+<td align="center">-0.2111</td>
+<td align="center">-1.692</td>
+<td align="center">-1.013</td>
+<td align="center">-0.7581</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>HPKP_BHKZ</strong></td>
+<td align="center">-0.1895</td>
+<td align="center">-1.231</td>
+<td align="center">-2.473</td>
+<td align="center">-1.049</td>
+<td align="center">-0.7433</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>TORZ_BGHZ</strong></td>
+<td align="center">-2.146</td>
+<td align="center">-0.7947</td>
+<td align="center">-1.823</td>
+<td align="center">-0.8831</td>
+<td align="center">-1.237</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>TRIR_KRAF</strong></td>
+<td align="center">-0.2067</td>
+<td align="center">-1.124</td>
+<td align="center">-1.665</td>
+<td align="center">-0.3986</td>
+<td align="center">-0.3801</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>MSKN_BHKZ</strong></td>
+<td align="center">-0.5748</td>
+<td align="center">-1.141</td>
+<td align="center">-1.844</td>
+<td align="center">-1.25</td>
+<td align="center">-1.753</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>TOKA_COMB</strong></td>
+<td align="center">-2.584</td>
+<td align="center">-1.031</td>
+<td align="center">-2.292</td>
+<td align="center">-0.4901</td>
+<td align="center">-1.595</td>
+</tr>
+</tbody>
+</table>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pander(colMeans(an.sharp))
+</code></pre></div></div>
+
+<table style="width:49%;">
+<colgroup>
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">pca</th>
+<th align="center">12</th>
+<th align="center">21</th>
+<th align="center">DOLS</th>
+<th align="center">IMOLS</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">-1.315</td>
+<td align="center">-1.042</td>
+<td align="center">-1.294</td>
+<td align="center">-1.171</td>
+<td align="center">-1.171</td>
+</tr>
+</tbody>
+</table>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pander(mDraw)
+</code></pre></div></div>
+
+<table style="width:72%;">
+<colgroup>
+<col width="22%" />
+<col width="11%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">pca</th>
+<th align="center">12</th>
+<th align="center">21</th>
+<th align="center">DOLS</th>
+<th align="center">IMOLS</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>MSKN_DADE</strong></td>
+<td align="center">0.2789</td>
+<td align="center">0.3671</td>
+<td align="center">0.4138</td>
+<td align="center">0.3967</td>
+<td align="center">0.3755</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>PETR_KAVR</strong></td>
+<td align="center">0.1793</td>
+<td align="center">0.3617</td>
+<td align="center">0.4567</td>
+<td align="center">0.4037</td>
+<td align="center">0.2511</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>SPDZ_SAHD</strong></td>
+<td align="center">0.4403</td>
+<td align="center">0.3156</td>
+<td align="center">0.3863</td>
+<td align="center">0.4205</td>
+<td align="center">0.3578</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>TOKA_SPDZ</strong></td>
+<td align="center">0.1986</td>
+<td align="center">0.5156</td>
+<td align="center">0.3159</td>
+<td align="center">0.4399</td>
+<td align="center">0.4006</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>TOKA_SAHD</strong></td>
+<td align="center">0.282</td>
+<td align="center">0.283</td>
+<td align="center">0.4208</td>
+<td align="center">0.3437</td>
+<td align="center">0.3221</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>TRIR_DADE</strong></td>
+<td align="center">0.2784</td>
+<td align="center">0.2638</td>
+<td align="center">0.3188</td>
+<td align="center">0.4852</td>
+<td align="center">0.3992</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>SPDZ_MADN</strong></td>
+<td align="center">0.3406</td>
+<td align="center">0.4062</td>
+<td align="center">0.3328</td>
+<td align="center">0.4447</td>
+<td align="center">0.4158</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>CHML_BMDZ</strong></td>
+<td align="center">0.07467</td>
+<td align="center">0.2817</td>
+<td align="center">0.3886</td>
+<td align="center">0.3145</td>
+<td align="center">0.2475</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>SAHD_PLKK</strong></td>
+<td align="center">0.2931</td>
+<td align="center">0.3197</td>
+<td align="center">0.4386</td>
+<td align="center">0.2892</td>
+<td align="center">0.2486</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>TRIR_MSKN</strong></td>
+<td align="center">0.1878</td>
+<td align="center">0.351</td>
+<td align="center">0.2876</td>
+<td align="center">0.4178</td>
+<td align="center">0.4631</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>KRAF_BHKZ</strong></td>
+<td align="center">0.04448</td>
+<td align="center">0.3062</td>
+<td align="center">0.4751</td>
+<td align="center">0.4103</td>
+<td align="center">0.241</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>SPDZ_BIME</strong></td>
+<td align="center">0.4283</td>
+<td align="center">0.378</td>
+<td align="center">0.4016</td>
+<td align="center">0.4799</td>
+<td align="center">0.3961</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>TOKA_PLKK</strong></td>
+<td align="center">0.3177</td>
+<td align="center">0.4282</td>
+<td align="center">0.3309</td>
+<td align="center">0.4117</td>
+<td align="center">0.3253</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>CHML_BSTE</strong></td>
+<td align="center">0.112</td>
+<td align="center">0.2647</td>
+<td align="center">0.3444</td>
+<td align="center">0.3167</td>
+<td align="center">0.3032</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>SPDZ_PLKK</strong></td>
+<td align="center">0.4161</td>
+<td align="center">0.5046</td>
+<td align="center">0.3598</td>
+<td align="center">0.4593</td>
+<td align="center">0.322</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>TRIR_BHKZ</strong></td>
+<td align="center">0.1818</td>
+<td align="center">0.3138</td>
+<td align="center">0.4168</td>
+<td align="center">0.2669</td>
+<td align="center">0.3103</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>TOKA_MADN</strong></td>
+<td align="center">0.1216</td>
+<td align="center">0.4248</td>
+<td align="center">0.2438</td>
+<td align="center">0.3445</td>
+<td align="center">0.3067</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>SSHR_AZIN</strong></td>
+<td align="center">0.1298</td>
+<td align="center">0.5659</td>
+<td align="center">0.3911</td>
+<td align="center">0.4373</td>
+<td align="center">0.4024</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>SPDZ_BANK</strong></td>
+<td align="center">0.5147</td>
+<td align="center">0.3888</td>
+<td align="center">0.3074</td>
+<td align="center">0.5018</td>
+<td align="center">0.4568</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>SPDZ_COMB</strong></td>
+<td align="center">0.4126</td>
+<td align="center">0.3378</td>
+<td align="center">0.4007</td>
+<td align="center">0.4031</td>
+<td align="center">0.4909</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>HPKP_BHKZ</strong></td>
+<td align="center">0.2917</td>
+<td align="center">0.3659</td>
+<td align="center">0.5302</td>
+<td align="center">0.4069</td>
+<td align="center">0.411</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>TORZ_BGHZ</strong></td>
+<td align="center">0.3651</td>
+<td align="center">0.3376</td>
+<td align="center">0.4483</td>
+<td align="center">0.3655</td>
+<td align="center">0.4021</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>TRIR_KRAF</strong></td>
+<td align="center">0.4259</td>
+<td align="center">0.4485</td>
+<td align="center">0.1548</td>
+<td align="center">0.4595</td>
+<td align="center">0.4244</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>MSKN_BHKZ</strong></td>
+<td align="center">0.07956</td>
+<td align="center">0.1547</td>
+<td align="center">0.5471</td>
+<td align="center">0.1523</td>
+<td align="center">0.2187</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>TOKA_COMB</strong></td>
+<td align="center">0.2974</td>
+<td align="center">0.3522</td>
+<td align="center">0.4789</td>
+<td align="center">0.2157</td>
+<td align="center">0.3648</td>
+</tr>
+</tbody>
+</table>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pander(colMeans(mDraw))
+</code></pre></div></div>
+
+<table style="width:49%;">
+<colgroup>
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">pca</th>
+<th align="center">12</th>
+<th align="center">21</th>
+<th align="center">DOLS</th>
+<th align="center">IMOLS</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">0.2677</td>
+<td align="center">0.3615</td>
+<td align="center">0.3836</td>
+<td align="center">0.3835</td>
+<td align="center">0.3543</td>
+</tr>
+</tbody>
+</table>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pander(UPR)
+</code></pre></div></div>
+
+<table style="width:71%;">
+<colgroup>
+<col width="22%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">pca</th>
+<th align="center">12</th>
+<th align="center">21</th>
+<th align="center">DOLS</th>
+<th align="center">IMOLS</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>MSKN_DADE</strong></td>
+<td align="center">0.5455</td>
+<td align="center">0.3821</td>
+<td align="center">0.9347</td>
+<td align="center">0.3742</td>
+<td align="center">0.4338</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>PETR_KAVR</strong></td>
+<td align="center">0.7307</td>
+<td align="center">0.7676</td>
+<td align="center">0.6951</td>
+<td align="center">0.8132</td>
+<td align="center">0.6747</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>SPDZ_SAHD</strong></td>
+<td align="center">0.4583</td>
+<td align="center">0.6584</td>
+<td align="center">0.8653</td>
+<td align="center">0.5329</td>
+<td align="center">0.6946</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>TOKA_SPDZ</strong></td>
+<td align="center">0.6109</td>
+<td align="center">0.7675</td>
+<td align="center">0.5703</td>
+<td align="center">0.7897</td>
+<td align="center">0.7353</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>TOKA_SAHD</strong></td>
+<td align="center">0.5242</td>
+<td align="center">0.8107</td>
+<td align="center">0.7898</td>
+<td align="center">0.8151</td>
+<td align="center">0.6241</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>TRIR_DADE</strong></td>
+<td align="center">0.6442</td>
+<td align="center">0.7448</td>
+<td align="center">0.838</td>
+<td align="center">0.7792</td>
+<td align="center">0.6542</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>SPDZ_MADN</strong></td>
+<td align="center">0.6146</td>
+<td align="center">0.4904</td>
+<td align="center">0.8401</td>
+<td align="center">0.5226</td>
+<td align="center">0.6238</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>CHML_BMDZ</strong></td>
+<td align="center">0.4323</td>
+<td align="center">0.8916</td>
+<td align="center">0.732</td>
+<td align="center">0.7125</td>
+<td align="center">0.7693</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>SAHD_PLKK</strong></td>
+<td align="center">0.5435</td>
+<td align="center">0.5619</td>
+<td align="center">0.8268</td>
+<td align="center">0.4784</td>
+<td align="center">0.4136</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>TRIR_MSKN</strong></td>
+<td align="center">0.5945</td>
+<td align="center">0.5636</td>
+<td align="center">0.7593</td>
+<td align="center">0.6129</td>
+<td align="center">0.4325</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>KRAF_BHKZ</strong></td>
+<td align="center">0.4044</td>
+<td align="center">0.7102</td>
+<td align="center">0.5377</td>
+<td align="center">0.55</td>
+<td align="center">0.437</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>SPDZ_BIME</strong></td>
+<td align="center">0.6229</td>
+<td align="center">0.7504</td>
+<td align="center">0.9058</td>
+<td align="center">0.6406</td>
+<td align="center">0.7573</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>TOKA_PLKK</strong></td>
+<td align="center">0.6079</td>
+<td align="center">0.687</td>
+<td align="center">0.8114</td>
+<td align="center">0.8254</td>
+<td align="center">0.6386</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>CHML_BSTE</strong></td>
+<td align="center">0.3633</td>
+<td align="center">0.6992</td>
+<td align="center">0.7413</td>
+<td align="center">0.6843</td>
+<td align="center">0.596</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>SPDZ_PLKK</strong></td>
+<td align="center">0.5079</td>
+<td align="center">0.6039</td>
+<td align="center">0.7131</td>
+<td align="center">0.5327</td>
+<td align="center">0.6544</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>TRIR_BHKZ</strong></td>
+<td align="center">0.665</td>
+<td align="center">0.568</td>
+<td align="center">0.5063</td>
+<td align="center">0.7001</td>
+<td align="center">0.6707</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>TOKA_MADN</strong></td>
+<td align="center">0.6713</td>
+<td align="center">0.6942</td>
+<td align="center">0.8158</td>
+<td align="center">0.6011</td>
+<td align="center">0.6285</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>SSHR_AZIN</strong></td>
+<td align="center">0.2865</td>
+<td align="center">0.4789</td>
+<td align="center">0.6822</td>
+<td align="center">0.7088</td>
+<td align="center">0.3111</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>SPDZ_BANK</strong></td>
+<td align="center">0.5062</td>
+<td align="center">0.5941</td>
+<td align="center">0.802</td>
+<td align="center">0.6959</td>
+<td align="center">0.557</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>SPDZ_COMB</strong></td>
+<td align="center">0.5231</td>
+<td align="center">0.5202</td>
+<td align="center">0.8103</td>
+<td align="center">0.6109</td>
+<td align="center">0.5333</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>HPKP_BHKZ</strong></td>
+<td align="center">0.7173</td>
+<td align="center">0.5855</td>
+<td align="center">0.4523</td>
+<td align="center">0.6834</td>
+<td align="center">0.6816</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>TORZ_BGHZ</strong></td>
+<td align="center">0.5695</td>
+<td align="center">0.8284</td>
+<td align="center">0.694</td>
+<td align="center">0.7353</td>
+<td align="center">0.7213</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>TRIR_KRAF</strong></td>
+<td align="center">0.7264</td>
+<td align="center">0.6139</td>
+<td align="center">0.4446</td>
+<td align="center">0.7623</td>
+<td align="center">0.7992</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>MSKN_BHKZ</strong></td>
+<td align="center">0.549</td>
+<td align="center">0.4921</td>
+<td align="center">0.825</td>
+<td align="center">0.5087</td>
+<td align="center">0.4751</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>TOKA_COMB</strong></td>
+<td align="center">0.4789</td>
+<td align="center">0.7741</td>
+<td align="center">0.705</td>
+<td align="center">0.8321</td>
+<td align="center">0.7183</td>
+</tr>
+</tbody>
+</table>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pander(colMeans(UPR))
+</code></pre></div></div>
+
+<table style="width:49%;">
+<colgroup>
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">pca</th>
+<th align="center">12</th>
+<th align="center">21</th>
+<th align="center">DOLS</th>
+<th align="center">IMOLS</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">0.5559</td>
+<td align="center">0.6496</td>
+<td align="center">0.7319</td>
+<td align="center">0.6601</td>
+<td align="center">0.6094</td>
+</tr>
+</tbody>
+</table>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#pander(zerocross)
+pander(colMeans(zerocross))
+</code></pre></div></div>
+
+<table style="width:43%;">
+<colgroup>
+<col width="8%" />
+<col width="8%" />
+<col width="6%" />
+<col width="9%" />
+<col width="9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">pca</th>
+<th align="center">12</th>
+<th align="center">21</th>
+<th align="center">DOLS</th>
+<th align="center">IMOLS</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">214.6</td>
+<td align="center">220.9</td>
+<td align="center">230</td>
+<td align="center">225.2</td>
+<td align="center">217.4</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>The results shows that the strategies are not profitable, so I leave
+this idea and I would not proceed for improving it. It it was supposed
+to be good it should have shown that in simplest form.</p>
+
+<p>Further total least square and after that IM OLS showed better results
+than others. The case that IM OLS works better than simple OLS was not a
+straightforward conclusion for me, because it uses hyper parameters and
+by my experience this would usually make things worse, which was not the
+case here.</p>
+
+<h6 id="please-inform-me-about-your-feedback-i-will-be-deeply-grateful-for-that-"><em>Please inform me about your feedback, I will be deeply grateful for that :)</em></h6>
+
+<h6 id="for-disclaimer-please-see-about-page">For disclaimer please see about page.</h6>
+:ET

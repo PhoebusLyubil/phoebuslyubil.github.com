@@ -1,0 +1,383 @@
+I"r8<h2 id="clustering">Clustering</h2>
+
+<p>I saw that some stocks with industry similarities, like sugar industry
+or auto-makers, behave in a different manner than other stocks. Tehran
+Stock Exchange provide many different sub-indexes. Some of them have
+only handful of companies. As a way to deal with this matter, I prefer
+to use cluster analysis. Since I don’t want the number of each group to
+be similar, I would not use k-means. I would rather use hierarchical
+clustering using Ward method.</p>
+
+<p>Having used ward method, first I would consider number of clusters,
+varying between 1 to 7 and take the one with the least out-of-sample
+rolling RMSE. Then I would consider different kind of distances to find
+which one results better results with the same criterion.</p>
+
+<p>I had expect that 3 clusters with Malinowski distances less than 1 (
+<em>L</em><sub><em>p</em></sub><em>n<strong>o</strong>r<strong>m</strong>s</em> , before this post I was using p = 0.7,
+so the outliers would be less influential in clustering results), yet
+the results ,to my surprise, yielded different outcomes.</p>
+
+<h3 id="clusters-and-indexes-for-each">Clusters and indexes for each</h3>
+
+<p>Making data like previous post we use the following for estimating
+clusters and groups:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>retDATAw&lt;- reshape(WDATA_last[, c(1,2,5)], timevar = "DATE",
+                   idvar = "sym", direction = "wide")
+retDATAw &lt;- t(retDATAw)
+colnames(retDATAw) &lt;- retDATAw[1,]
+retDATAw &lt;- retDATAw[-1,]
+J&lt;- rownames(retDATAw)
+J&lt;- matrix(unlist(strsplit(J, split= "[.]")), ncol=2,byrow=T)[,2]
+rownames(retDATAw)&lt;- J
+rm(J)
+retDATAw&lt;- apply(retDATAw,2, function(x) as.numeric(x))
+# scaling data
+scale_retDATAw&lt;- apply(retDATAw,2, scale)
+# computing distances
+distance&lt;- dist(t(retDATAw), method = "minkowski", diag = TRUE, p =1)
+distance&lt;- as.matrix(distance)
+for( i in 1:dim(distance)[1]){
+  distance &lt;- distance[,complete.cases(distance[i,]) ]
+  distance &lt;- distance[complete.cases(distance[,i]), ]
+}
+rm(i)
+distance&lt;- as.dist(distance)
+# fitting cluster
+fit = hclust(distance, method = "ward")
+
+
+# finding number of cluster that has at least 5 members
+n.groups.finder &lt;- function(n.groups.) {
+  success &lt;- FALSE
+  i &lt;- 1
+  n.groups &lt;- n.groups.
+  while (!success) {
+    groups&lt;- cutree(fit, n.groups)
+    success &lt;- sum(summary(as.factor(groups)) &lt;= 5) &lt; i
+    i &lt;- i + 1
+    n.groups &lt;- n.groups + 1
+  }
+  return(groups)
+}
+
+# cutting tree
+cluster.results&lt;- list()
+for( i in 2 : 7){
+n.groups &lt;- i
+groups &lt;- n.groups.finder( n.groups)
+n.gr&lt;- which( summary(as.factor( groups))&gt; 5)
+cluster.results[[ i]]&lt;- list( n.gr = n.gr, groups = groups)
+}
+
+# getting names of members
+groups&lt;- list()
+temp&lt;- list()
+for( i in 2: length( cluster.results)){
+  Cl.gr&lt;- cbind( cluster.results[[i]]$groups)
+  Cl.gr&lt;- cbind.data.frame( groups = Cl.gr,sym = ( rownames( Cl.gr)))
+  for( j in 1: length( cluster.results[[i]]$n.gr)){
+    temp1&lt;- Cl.gr[Cl.gr$groups== cluster.results[[i]]$n.gr[j],][,2]
+    temp1&lt;- droplevels(temp1)
+    temp[[j]]&lt;- temp1 
+}
+  groups[[i]]&lt;- temp
+}
+</code></pre></div></div>
+
+<p><em>Here I used Whole sample for estimating clusters, this is against crossvalidation methods, since the data have lots of NA and because of that computing distances with rolling window was not possible, I used this method. I used this method with 3 cluster before and</em> <strong>Temporal graph of clusters varies a lot during time.</strong> 
+Now that the we get the name of members for each group we can make
+indexes for each of them. Using last posts results we have:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>index.maker&lt;- function(WDATA. = WDATA, date_data. = date_data,
+                       sort_base_index. = sort_base_index,
+                       WDATA_last. = WDATA_last, data_NA_rm. =data_NA_rm){
+  
+  sub_year_data&lt;- list()
+  for(i in 2: length(date_data.)){
+    sub_data&lt;- subset(WDATA., WDATA.$DATE &lt;= date_data.[i] &amp; WDATA.$DATE &gt;= date_data.[i-1])
+    sub_year_data[[i-1]]&lt;- ddply(sub_data, 'sym',
+                                 .fun = function(x) data_NA_rm.(x), .progress = "tk")
+  }
+  
+  portion.sym&lt;- llply(sub_year_data, function(x) sort_base_index.(x, n.var = 3/4))
+  
+  index_ave&lt;- NULL
+  last.VLIA&lt;- 1
+  last.VLIC&lt;- 1
+  for(i in 2 : (length (date_data.) -1)){
+    sub_data&lt;- subset(WDATA_last., WDATA_last.$DATE &lt;= date_data.[i+1] &amp;
+                        WDATA_last.$DATE &gt;= date_data.[i])
+    sub_index_data&lt;- sub_data[sub_data$sym %in% as.factor(portion.sym[[i-1]]),]
+    dates.sub&lt;- as.Date(levels(as.factor(sub_index_data$DATE)))
+    VLIC&lt;- cbind(c(rep(NA, (length(dates.sub) + 1))), c(rep(NA, (length(dates.sub) + 1))))
+    VLIC[ 1, 1]&lt;- last.VLIC
+    for ( j in 2: (length(dates.sub) + 1)) {
+      sub_index_data_date&lt;- subset(sub_index_data, sub_index_data$DATE == dates.sub[j-1] )
+      VLIC[j,]&lt;- cbind(VLGI(sub_index_data_date$r.C, VLIC[ j - 1, 1]), as.Date(dates.sub[j-1]))
+      
+    }
+    temp&lt;- VLIC
+    
+    last.VLIC&lt;- VLIC[ dim(VLIC)[1], 1]
+    index_ave&lt;- rbind(index_ave, temp)
+  }
+  index_ave&lt;- index_ave[ complete.cases(index_ave[ ,2]),]
+  colnames(index_ave)&lt;- c("VLGI", "DATE")
+  return(index_ave)
+}
+
+
+index.VLGI.groups&lt;- list()
+for ( i in 2: length( groups)){
+  index.VLGI&lt;- NULL
+  for( j in 1: length(groups[[i]])){
+    group.data&lt;- subset( WDATA, WDATA$sym %in% groups[[i]][[j]])
+    group.data_last&lt;- subset( WDATA_last, WDATA_last$sym %in% groups[[i]][[j]])
+    temp&lt;- index.maker(WDATA. = group.data, WDATA_last. = group.data_last)
+    temp&lt;- cbind( temp, j)
+    index.VLGI&lt;- rbind(index.VLGI, temp)
+  }
+  index.VLGI.groups[[i]]&lt;- index.VLGI
+}
+
+# computing reults for whole sample
+index.VLGI.groups[[1]]&lt;- cbind(index.maker(WDATA. = WDATA, WDATA_last. = WDATA_last),1)
+</code></pre></div></div>
+
+<h3 id="computing-results">Computing results</h3>
+
+<p>Using previously named function, we parallel compute the results for predictory autoregressive model
+<em>r</em><sub><em>i</em>, <em>t</em></sub> = <em>α</em> + <em>β</em><sub>1</sub><em>r</em><sub><em>i</em>, <em>t</em> − 1</sub> + <em>β</em><sub>2</sub><em>r</em><sub><em>m</em>, <em>t</em> − 1</sub> + <em>e</em>
+:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>th= floor((Sys.Date() - as.Date("2014-03-21"))*240/365)
+h&lt;-1
+Order&lt;-c(1,0,0)
+dimmodel&lt;-3
+win=120
+model="pARp"
+regressed="retCL_t"
+reg.type = "prd"
+MAR_MOD.="DVLGI"
+
+
+
+pARp.DVLGI.gr&lt;- list()
+for( i in 2: length(index.VLGI.groups)){
+  VLGI.gr.data&lt;- as.data.frame(index.VLGI.groups[[i]])
+  colnames(VLGI.gr.data)&lt;- c( "VLGI", "DATE", "gr")
+  VLGI.gr.data$DATE&lt;- as.Date( VLGI.gr.data$DATE)
+  pARp.DVLGI&lt;- NULL
+  for( j in 1: length(levels(as.factor(VLGI.gr.data$gr)))){
+    VLGI.data&lt;- subset(VLGI.gr.data, VLGI.gr.data$gr == j)
+  group.data&lt;- subset( WDATA, WDATA$sym %in% groups[[i]][[j]])
+
+  TIND.var&lt;- cbind.data.frame(DATE = VLGI.data$DATE, 
+                              PerChange(VLGI.data$VLGI))
+  TIND.var[is.nan.data.frame(TIND.var)] &lt;- 0
+  TIND.var[,2][ TIND.var[,2] == -Inf | TIND.var[,2] == Inf] = 0 
+  colnames(TIND.var)&lt;- c("DATE", "DVLGI")
+  
+  group.data&lt;- subset(group.data, group.data$DATE &gt;= TIND.var$DATE[1])
+  group.data$sym &lt;- droplevels(group.data$sym)
+  
+  cl = createCluster(12, export = list("Arima.prd.IND", "group.data",
+                                       "reg.type",
+                                       "h","Order","TIND.var",
+                                       "win", "th", "h","MAR_MOD.",
+                                       "model","dimmodel","regressed"
+  ),
+  lib = list("forecast", "dplyr"))
+  
+  
+  
+  temp&lt;-ddply(.data = group.data, .(sym), .progress= "tk",
+                       .parallel = TRUE,
+                       .fun =function(x) Arima.prd.IND(xsym = x,
+                                                       MAR_MOD=MAR_MOD.,
+                                                       KK=TIND.var,
+                                                       h=1,win=120, th=th, Order=c(1,0,0),
+                                                       model="pARp",
+                                                       dimmodel=3, regressed="retCL_t",
+                                                       reg.type = "prd"
+                       ))
+  
+  stopCluster(cl)
+  pARp.DVLGI&lt;- rbind( pARp.DVLGI, temp)
+  }
+  pARp.DVLGI.gr[[i]]&lt;- pARp.DVLGI
+}
+</code></pre></div></div>
+
+<p>I do the same thing for whole sample without clusters too, so I could
+compare the results.</p>
+
+<h3 id="number-of-cluster-results">Number of cluster results</h3>
+
+<p>The results after “2016-01-01” shows that having four clusters has less
+rolling RMSE than others.</p>
+
+<table style="width:94%;">
+<colgroup>
+<col width="19%" />
+<col width="9%" />
+<col width="9%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">1</th>
+<th align="center">2</th>
+<th align="center">3</th>
+<th align="center">4</th>
+<th align="center">5</th>
+<th align="center">6</th>
+<th align="center">7</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>RMSE.gr</strong></td>
+<td align="center">0.0249</td>
+<td align="center">0.0249</td>
+<td align="center">0.02492</td>
+<td align="center">0.02478</td>
+<td align="center">0.02479</td>
+<td align="center">0.02482</td>
+<td align="center">0.0248</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="distances">Distances</h2>
+
+<p>Having seen the results for number of clusters, I choose different
+distances for computing the results.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>distance.seq&lt;- c(.4,.5,.6,.7,.8,.9,1,1.5,2,3,4,6)
+</code></pre></div></div>
+
+<p>As I said before, I was choosing .7 as my <em>p</em>, but after seeing this I
+saw that Elucidian distance yields better results. Since we normalized
+returns for this computations, this means that Elucidian distance is
+approximately equal to 2(1 − <em>ρ</em>) in which <em>ρ</em> stands for correlation.
+So using correlations as a base for distances would have resulted the
+same thing. It is interesting that here, my phobia about including
+outliers are false :)) A very good step for overcoming my phobias
+experimentally :))</p>
+
+<table style="width:100%;">
+<caption>Table continues below</caption>
+<colgroup>
+<col width="20%" />
+<col width="10%" />
+<col width="10%" />
+<col width="10%" />
+<col width="10%" />
+<col width="10%" />
+<col width="10%" />
+<col width="10%" />
+<col width="10%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">0.4</th>
+<th align="center">0.5</th>
+<th align="center">0.6</th>
+<th align="center">0.7</th>
+<th align="center">0.8</th>
+<th align="center">0.9</th>
+<th align="center">1</th>
+<th align="center">1.5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>RMSE.dist</strong></td>
+<td align="center">0.02477</td>
+<td align="center">0.02481</td>
+<td align="center">0.02477</td>
+<td align="center">0.02467</td>
+<td align="center">0.02488</td>
+<td align="center">0.02488</td>
+<td align="center">0.02478</td>
+<td align="center">0.02472</td>
+</tr>
+</tbody>
+</table>
+
+<table style="width:67%;">
+<colgroup>
+<col width="22%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">2</th>
+<th align="center">3</th>
+<th align="center">4</th>
+<th align="center">6</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>RMSE.dist</strong></td>
+<td align="center">0.02267</td>
+<td align="center">0.02271</td>
+<td align="center">0.02275</td>
+<td align="center">0.02272</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>The results show that having four number of clusters with Elucidian
+distances yield better out-of-sample rolling RMSE results. So my guesses
+that some groups of stocks behave differently is not rejected under this
+criterion. But my idea about inclusion of outliers is rejected. Although
+I have not printed the groups since they are very lengthy, We would see
+more similar companies when <em>p</em> is less than one, yet the results are
+worse. When <em>p</em> is less than one one cluster is about auto-makers, and
+one include pharmaceutical industries (previously I saw sugar industry), but
+with Eluciden distance, results are more mixed, and number of members
+are much more. But we can see that most petrochemicals and petroleum
+companies are in the same cluster with some other companies of which
+some are like them and export oriented and revived after lifting the
+sanctions( group 1, 90 members.) And Auto-makers with some other not
+related companies are in another one( Group 2, 132 members.) Last group
+have more than 170 members and pharmaceutical and financial corporations
+are mostly inside that( group 4.)</p>
+
+<p>The plot for the sub-indexes are like this:</p>
+
+<p><img src="../img//cluster plots.png" alt="" /></p>
+
+<p>Looking at the graph is very interesting, and we see partly different
+and partly similar movements among groups. What is very fearsome is
+those movements that are common and very sharp, these could easily
+destroy my retirement plans. If I see more clearly, I see that these
+movements are mostly external and international shocks, like sanctions
+or lifting them or any expectations about them. I would write the next
+post about how to partly hedge these risk with existed instruments, oh
+yeah, I talked about instruments, but there is no options, Forex futures
+and short selling of stocks possible in this market and I have no access
+to international markets. I would try my best and cross my fingers for
+that, Voila!</p>
+
+<h6 id="please-inform-me-about-your-feedback-i-will-be-deeply-grateful-for-that-"><em>Please inform me about your feedback, I will be deeply grateful for that :)</em></h6>
+
+<h6 id="for-disclaimer-please-see-about-page">For disclaimer please see about page.</h6>
+:ET

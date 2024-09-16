@@ -1,6 +1,6 @@
 ---
 layout: post
-subtitle: Boys Club's ANDY (ETH)
+subtitle: Analyzing the Behavior and Profit of Early Buyers of Boys Club's ANDY (ETH)
 tags: [ ANDY, ANDY Ethereum. Crypto, Token analyzing, Dune Dashboard,
  Dune Analytics, CoinMarketCap webapi, Python]
 comments: true
